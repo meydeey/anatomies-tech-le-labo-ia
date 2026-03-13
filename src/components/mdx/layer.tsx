@@ -30,6 +30,17 @@ const layerBadgeBgColors = [
   "bg-emerald-400",
 ];
 
+const layerHoverBg = [
+  "hover:bg-slate-50",
+  "hover:bg-slate-50",
+  "hover:bg-indigo-50/50",
+  "hover:bg-indigo-50/50",
+  "hover:bg-indigo-50/30",
+  "hover:bg-sky-50/30",
+  "hover:bg-emerald-50/30",
+  "hover:bg-emerald-50/30",
+];
+
 interface LayerProps {
   id: string;
   order: number;
@@ -50,20 +61,26 @@ export default function Layer({
   const colorIndex = Math.min(order - 1, layerBorderColors.length - 1);
   const borderColor = layerBorderColors[colorIndex];
   const badgeBg = layerBadgeBgColors[colorIndex];
+  const hoverBg = layerHoverBg[colorIndex];
   const IconComponent = getIcon(icon);
 
   return (
     <AccordionItem
       value={id}
       className={cn(
-        "border-l-4 rounded-lg bg-card ring-1 ring-foreground/5 overflow-hidden",
+        "border-l-4 rounded-lg bg-card shadow-sm ring-1 ring-border/50 overflow-hidden transition-shadow hover:shadow-md",
         borderColor,
       )}
     >
-      <AccordionTrigger className="px-4 py-3 gap-3 hover:no-underline">
+      <AccordionTrigger
+        className={cn(
+          "px-4 py-3.5 gap-3 hover:no-underline transition-colors rounded-t-lg cursor-pointer",
+          hoverBg,
+        )}
+      >
         <span
           className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white",
+            "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm",
             badgeBg,
           )}
         >
@@ -77,8 +94,10 @@ export default function Layer({
           </span>
         </span>
       </AccordionTrigger>
-      <AccordionContent className="px-4 pb-4">
-        <div className="prose prose-sm max-w-none pl-10">{children}</div>
+      <AccordionContent className="px-4 pb-5 pt-1">
+        <div className="prose prose-sm prose-slate max-w-none pl-11 prose-headings:font-semibold prose-headings:tracking-tight prose-p:leading-relaxed prose-p:text-muted-foreground">
+          {children}
+        </div>
       </AccordionContent>
     </AccordionItem>
   );

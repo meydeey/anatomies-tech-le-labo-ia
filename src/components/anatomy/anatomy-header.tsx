@@ -18,22 +18,24 @@ export default function AnatomyHeader({
   const IconComponent = getIcon(icon);
 
   return (
-    <div className="mb-8">
-      <div className="flex items-start gap-4">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <IconComponent className="size-6 text-primary" />
+    <div className="mb-10">
+      <div className="flex items-start gap-5">
+        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20 shadow-sm">
+          <IconComponent className="size-7 text-primary" />
         </div>
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               {title}
             </h1>
-            <Badge variant="secondary">{layerCount} couches</Badge>
+            <Badge variant="secondary" className="font-semibold">
+              {layerCount} couches
+            </Badge>
           </div>
-          <p className="text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground leading-relaxed">{description}</p>
         </div>
       </div>
-      <Separator className="mt-6" />
+      <Separator className="mt-8" />
     </div>
   );
 }

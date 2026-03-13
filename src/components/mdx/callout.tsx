@@ -3,19 +3,25 @@ import { cn } from "@/lib/utils";
 
 const calloutConfig = {
   info: {
-    bg: "bg-blue-50 ring-blue-200 text-blue-900",
+    wrapper: "border-l-blue-400 bg-blue-50/80 text-blue-950",
     icon: Info,
     iconColor: "text-blue-500",
+    label: "Info",
+    labelColor: "text-blue-500",
   },
   warning: {
-    bg: "bg-orange-50 ring-orange-200 text-orange-900",
+    wrapper: "border-l-orange-400 bg-orange-50/80 text-orange-950",
     icon: AlertTriangle,
     iconColor: "text-orange-500",
+    label: "Attention",
+    labelColor: "text-orange-500",
   },
   tip: {
-    bg: "bg-green-50 ring-green-200 text-green-900",
+    wrapper: "border-l-emerald-400 bg-emerald-50/80 text-emerald-950",
     icon: Lightbulb,
-    iconColor: "text-green-500",
+    iconColor: "text-emerald-500",
+    label: "Astuce",
+    labelColor: "text-emerald-500",
   },
 } as const;
 
@@ -29,9 +35,24 @@ export default function Callout({ type = "info", children }: CalloutProps) {
   const Icon = config.icon;
 
   return (
-    <div className={cn("my-4 flex gap-3 rounded-lg p-4 ring-1", config.bg)}>
+    <div
+      className={cn(
+        "my-5 flex gap-3 rounded-lg border-l-4 p-4 shadow-sm",
+        config.wrapper,
+      )}
+    >
       <Icon className={cn("mt-0.5 size-5 shrink-0", config.iconColor)} />
-      <div className="text-sm leading-relaxed">{children}</div>
+      <div className="flex flex-col gap-1.5">
+        <span
+          className={cn(
+            "text-[11px] font-bold uppercase tracking-wider",
+            config.labelColor,
+          )}
+        >
+          {config.label}
+        </span>
+        <div className="text-sm leading-relaxed">{children}</div>
+      </div>
     </div>
   );
 }
