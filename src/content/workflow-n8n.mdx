@@ -1,3 +1,15 @@
+<FlowDiagram
+  title="Flux d'un workflow n8n"
+  steps={[
+    { label: "Trigger", icon: "Zap", description: "Webhook / Cron" },
+    { label: "Input", icon: "FileText", description: "Données entrantes" },
+    { label: "Process", icon: "Code", description: "Transformation" },
+    { label: "API", icon: "Globe", description: "Appels externes" },
+    { label: "Conditions", icon: "GitBranch", description: "Si / Sinon" },
+    { label: "Output", icon: "Database", description: "Stockage / Envoi" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="trigger-declencheur" order={1} title="Trigger / Déclencheur" subtitle="L'événement qui démarre le workflow" icon="Zap">

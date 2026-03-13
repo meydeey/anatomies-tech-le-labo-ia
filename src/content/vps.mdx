@@ -1,3 +1,16 @@
+<StackDiagram
+  title="Architecture d'un VPS"
+  layers={[
+    { label: "Applications", description: "Sites, APIs, services" },
+    { label: "SSH / Accès", description: "Gestion à distance" },
+    { label: "Réseau", description: "IP publique, firewall, ports" },
+    { label: "Système d'exploitation", description: "Ubuntu, Debian" },
+    { label: "Machine Virtuelle", description: "Instance isolée" },
+    { label: "Hyperviseur", description: "KVM, VMware" },
+    { label: "Hardware", description: "CPU, RAM, SSD" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="silicium-hardware" order={1} title="Silicium & Hardware" subtitle="Le serveur physique dans un datacenter" icon="Cpu">

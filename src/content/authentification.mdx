@@ -1,3 +1,15 @@
+<FlowDiagram
+  title="Flux d'authentification"
+  steps={[
+    { label: "Login", icon: "Key", description: "Email + mot de passe" },
+    { label: "Hash", icon: "Shield", description: "bcrypt / argon2" },
+    { label: "Vérification", icon: "Database", description: "Comparaison" },
+    { label: "Token", icon: "FileText", description: "JWT émis" },
+    { label: "Accès", icon: "Lock", description: "Ressource protégée" },
+    { label: "Refresh", icon: "Key", description: "Renouvellement" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="identite" order={1} title="Identité" subtitle="Qui es-tu ? (email, username)" icon="User">

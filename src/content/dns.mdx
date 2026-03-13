@@ -1,3 +1,15 @@
+<FlowDiagram
+  title="Résolution DNS étape par étape"
+  steps={[
+    { label: "Navigateur", icon: "Monitor", description: "google.com ?" },
+    { label: "Resolver", icon: "Server", description: "Cache local" },
+    { label: "Root", icon: "Globe", description: "→ .com" },
+    { label: "TLD", icon: "Network", description: "→ google.com" },
+    { label: "Autoritaire", icon: "Database", description: "→ 142.250.x.x" },
+    { label: "IP finale", icon: "Monitor", description: "Connexion !" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="nom-domaine-achete" order={1} title="Nom de domaine achete" subtitle="Le nom lisible (monsite.com)" icon="Tag">

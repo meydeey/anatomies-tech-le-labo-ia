@@ -1,3 +1,16 @@
+<StackDiagram
+  title="Architecture d'une base de données"
+  layers={[
+    { label: "Application / ORM", description: "Prisma, Drizzle, SQLAlchemy" },
+    { label: "Authentification", description: "RLS, rôles, permissions" },
+    { label: "SQL / Requêtes", description: "SELECT, INSERT, JOIN" },
+    { label: "Index", description: "B-tree, hash, GIN, GiST" },
+    { label: "Schéma", description: "Tables, colonnes, contraintes" },
+    { label: "Moteur", description: "PostgreSQL, MySQL, SQLite" },
+    { label: "Stockage disque", description: "Pages, WAL, MVCC" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="disque-stockage" order={1} title="Disque dur / Stockage" subtitle="Où les données sont physiquement écrites" icon="HardDrive">

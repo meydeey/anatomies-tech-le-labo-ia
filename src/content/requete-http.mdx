@@ -1,3 +1,29 @@
+<FlowDiagram
+  title="Cycle de vie d'une requête HTTP"
+  steps={[
+    { label: "Client", icon: "Monitor" },
+    { label: "DNS", icon: "Globe", description: "Résolution" },
+    { label: "TCP", icon: "Network", description: "Connexion" },
+    { label: "TLS", icon: "Lock", description: "Chiffrement" },
+    { label: "Requête", icon: "FileText", description: "GET/POST" },
+    { label: "Serveur", icon: "Server", description: "Traitement" },
+    { label: "Réponse", icon: "FileText", description: "200 OK" },
+    { label: "Rendu", icon: "Monitor", description: "Affichage" },
+  ]}
+/>
+
+<NetworkDiagram
+  title="Échange client ↔ serveur"
+  left="Client"
+  right="Serveur"
+  exchanges={[
+    { from: "left", label: "GET /api/users", color: "blue" },
+    { from: "right", label: "200 OK — JSON", color: "green" },
+    { from: "left", label: "POST /api/login", color: "purple" },
+    { from: "right", label: "401 Unauthorized", color: "red" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="client-navigateur" order={1} title="Client (navigateur)" subtitle="L'utilisateur qui clique" icon="Monitor">

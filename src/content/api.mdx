@@ -1,3 +1,16 @@
+<StackDiagram
+  title="Architecture d'une API"
+  layers={[
+    { label: "Consumer", description: "Frontend, mobile, service tiers" },
+    { label: "Documentation", description: "OpenAPI / Swagger" },
+    { label: "Authentification", description: "JWT, API Key, OAuth" },
+    { label: "HTTP / JSON", description: "Transport et format" },
+    { label: "Routes", description: "GET /users, POST /auth" },
+    { label: "Logique métier", description: "Validation, règles" },
+    { label: "Données", description: "PostgreSQL, Redis, Storage" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="donnees-brutes" order={1} title="Donnees brutes" subtitle="L'information stockee (BDD, fichiers)" icon="Database">

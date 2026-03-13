@@ -1,3 +1,17 @@
+<NetworkDiagram
+  title="Handshake TLS simplifié"
+  left="Client"
+  right="Serveur"
+  exchanges={[
+    { from: "left", label: "ClientHello — versions + ciphers", color: "blue" },
+    { from: "right", label: "ServerHello — cipher choisi", color: "green" },
+    { from: "right", label: "Certificat + clé publique", color: "purple" },
+    { from: "left", label: "Clé de session chiffrée", color: "orange" },
+    { from: "left", label: "Finished ✓", color: "slate" },
+    { from: "right", label: "Finished ✓", color: "slate" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="texte-en-clair" order={1} title="Texte en clair" subtitle="Les données non protégées" icon="FileText">

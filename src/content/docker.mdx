@@ -1,3 +1,17 @@
+<StackDiagram
+  title="Architecture Docker"
+  layers={[
+    { label: "Application", description: "Code + dépendances" },
+    { label: "Docker Compose", description: "Orchestration multi-conteneurs" },
+    { label: "Volumes / Réseau", description: "Persistance et communication" },
+    { label: "Conteneur", description: "Instance isolée d'une image" },
+    { label: "Image", description: "Snapshot du filesystem" },
+    { label: "Docker Engine", description: "Runtime + API" },
+    { label: "OS Hôte", description: "Linux / macOS / Windows" },
+    { label: "Hardware", description: "CPU, RAM, Disque" },
+  ]}
+/>
+
 <LayerStack>
 
 <Layer id="hardware-docker" order={1} title="Hardware du serveur" subtitle="La machine physique" icon="Server">
