@@ -1,0 +1,183 @@
+<LayerStack>
+
+<Layer id="hardware-io" order={1} title="Hardware (clavier/écran)" subtitle="Les périphériques d'entrée/sortie" icon="Keyboard">
+
+## Le point de contact physique
+
+Avant d'être du logiciel, le terminal commence par du matériel. Ton clavier est le périphérique d'entrée : chaque touche que tu presses génère un signal électrique qui est converti en un code numérique (un "scancode"). Ton écran est le périphérique de sortie : il reçoit des données et les affiche sous forme de texte.
+
+À l'origine, un "terminal" était un vrai appareil physique — un clavier + un écran cathodique, connecté par câble à un gros ordinateur central (le mainframe). Les employés tapaient des commandes sur leur terminal, et les résultats s'affichaient à l'écran. Il n'y avait pas de souris, pas de fenêtres, pas d'icônes. Juste du texte.
+
+Aujourd'hui, les terminaux physiques ont disparu, mais le concept survit dans les "émulateurs de terminal" (iTerm, Windows Terminal, le terminal de VS Code). Ces logiciels simulent le comportement d'un vrai terminal physique, directement dans ton système d'exploitation moderne.
+
+<Analogy>
+Le clavier et l'écran d'un terminal, c'est comme le guichet d'une banque à l'ancienne. Tu écris ta demande sur un papier (le clavier), tu le passes au guichetier (l'ordinateur), et il te renvoie la réponse sur un autre papier (l'écran). Le guichet est l'interface physique entre toi et la banque.
+</Analogy>
+
+<KeyConcept term="Entrée/Sortie (I/O)">
+Les deux flux fondamentaux de l'informatique. L'entrée (input) c'est ce qui rentre dans l'ordinateur : les touches du clavier, les clics de souris, les données réseau. La sortie (output) c'est ce qui en sort : le texte à l'écran, les fichiers créés, les paquets réseau envoyés. Un terminal est essentiellement une interface I/O textuelle.
+</KeyConcept>
+
+<Example brand="IBM">
+Dans les années 70-80, IBM vendait des terminaux physiques comme le VT100. Des milliers d'entreprises utilisaient ces machines pour accéder à leurs mainframes. Les banques, les compagnies aériennes, les administrations — tout passait par ces terminaux textuels. Quand tu utilises iTerm ou Windows Terminal aujourd'hui, tu reproduis exactement ce qu'un employé IBM faisait il y a 50 ans.
+</Example>
+
+</Layer>
+
+<Layer id="kernel" order={2} title="Kernel" subtitle="Le noyau qui parle au hardware" icon="Cpu">
+
+## Le traducteur entre le logiciel et le matériel
+
+Le kernel (noyau) est le coeur du système d'exploitation. C'est le seul logiciel qui a le droit de parler directement au hardware. Quand tu appuies sur une touche, c'est le kernel qui reçoit le signal électrique du clavier, le traduit en caractère, et le transmet au bon programme.
+
+Le kernel gère absolument tout : la mémoire (quelle application a droit à combien de RAM), le processeur (quelle application tourne à quel moment), les fichiers (lire et écrire sur le disque), le réseau (envoyer et recevoir des paquets). C'est un chef d'orchestre invisible mais omnipotent.
+
+Quand tu tapes une commande dans le terminal, le kernel est impliqué à chaque étape. Il reçoit tes frappes clavier, les passe au shell, exécute le programme demandé, lui alloue de la mémoire et du CPU, puis affiche la sortie à l'écran. Tout ça en quelques millisecondes.
+
+<Analogy>
+Le kernel, c'est le système nerveux central de ton ordinateur. Ton cerveau (les applications) veut bouger un doigt (écrire un fichier), mais il ne sait pas parler directement aux muscles (le hardware). Le système nerveux (le kernel) traduit l'intention en signaux électriques que les muscles comprennent. Sans système nerveux, le cerveau est impuissant.
+</Analogy>
+
+<KeyConcept term="Kernel (Noyau)">
+Le programme central d'un système d'exploitation qui s'exécute en permanence et gère toutes les ressources hardware (CPU, RAM, disque, réseau, périphériques). Sur Linux, le kernel est le projet open source créé par Linus Torvalds en 1991. Sur macOS, c'est XNU. Sur Windows, c'est NT. Aucun logiciel ne peut accéder au hardware sans passer par le kernel.
+</KeyConcept>
+
+<Example brand="Google">
+Android, le système d'exploitation de Google qui fait tourner 3 milliards de smartphones, utilise le kernel Linux. Chaque fois que tu prends une photo sur ton Android, c'est le kernel Linux qui parle à la caméra, stocke le fichier, et notifie l'application galerie. Le même kernel Linux gère les serveurs Google, les VPS cloud, et ton terminal.
+</Example>
+
+</Layer>
+
+<Layer id="shell" order={3} title="Shell (bash/zsh)" subtitle="L'interpréteur de commandes" icon="ChevronRight">
+
+## Le cerveau qui comprend ce que tu tapes
+
+Le shell est le programme qui interprète tes commandes textuelles et les transforme en actions. Quand tu tapes `ls -la`, c'est le shell qui comprend que tu veux lister les fichiers, qui trouve le programme `ls` sur le disque, qui lui passe les options `-la`, et qui affiche le résultat.
+
+Bash (Bourne Again SHell) est le shell par défaut sur la plupart des Linux. Zsh est une alternative plus moderne, par défaut sur macOS depuis Catalina. Fish est un autre choix populaire. Chaque shell a sa syntaxe, ses fonctionnalités et ses raccourcis, mais ils font tous le même travail de base : lire une commande, l'exécuter, afficher le résultat.
+
+Le shell est aussi un vrai langage de programmation. Tu peux écrire des scripts (des fichiers .sh) avec des variables, des boucles, des conditions. C'est le couteau suisse de l'automatisation sous Linux. Chaque script que tu vois dans un tutoriel d'installation ("copie-colle cette commande") est interprété par un shell.
+
+<Analogy>
+Le shell, c'est comme un traducteur qui parle couramment "humain" et "machine". Tu lui dis en quasi-français "montre-moi les fichiers ici" (ls), et lui traduit ça en instructions que le kernel peut exécuter. Si tu fais une faute de syntaxe, il te dit "command not found" — il ne devine pas, il traduit littéralement.
+</Analogy>
+
+<KeyConcept term="Shell">
+Un programme qui sert d'interface entre toi et le système d'exploitation. Il lit tes commandes textuelles, les interprète, lance les programmes correspondants, et te renvoie le résultat. Les shells les plus courants sont Bash (Linux), Zsh (macOS) et PowerShell (Windows). Le shell est aussi un langage de script complet.
+</KeyConcept>
+
+<Example brand="Apple">
+En 2019, Apple a remplacé Bash par Zsh comme shell par défaut sur macOS Catalina. Pourquoi ? Bash était resté bloqué en version 3.2 sur macOS à cause de sa licence GPL v3 qu'Apple ne voulait pas accepter. Zsh, sous licence MIT, offrait plus de fonctionnalités (autocomplétion avancée, thèmes, plugins) sans les contraintes de licence. Si tu utilises un Mac, tu utilises déjà Zsh.
+</Example>
+
+<Callout type="info">
+Le prompt (le texte avant ton curseur, genre `user@server:~$`) fait partie du shell, pas du terminal. C'est le shell qui décide ce qu'il affiche comme prompt. Tu peux le personnaliser avec des outils comme Oh My Zsh ou Starship.
+</Callout>
+
+</Layer>
+
+<Layer id="environnement" order={4} title="Environnement" subtitle="Variables, PATH, config" icon="Settings">
+
+## Le contexte invisible qui change tout
+
+L'environnement, c'est un ensemble de variables invisibles qui influencent le comportement de ton terminal et de tes programmes. La plus importante est `PATH` : une liste de dossiers où le shell cherche les programmes. Quand tu tapes `node`, le shell parcourt chaque dossier du PATH jusqu'à trouver un exécutable appelé `node`. S'il ne le trouve pas : "command not found".
+
+Les variables d'environnement sont partout. `HOME` contient le chemin de ton dossier utilisateur. `USER` contient ton nom d'utilisateur. `LANG` définit la langue. `EDITOR` définit l'éditeur de texte par défaut. Les applications lisent ces variables pour adapter leur comportement sans que tu aies à les configurer manuellement.
+
+Tu peux voir toutes tes variables avec `env` ou `printenv`. Tu peux en créer avec `export MA_VARIABLE="valeur"`. Les fichiers `.bashrc`, `.zshrc` ou `.profile` sont des scripts qui s'exécutent automatiquement à chaque ouverture de terminal — c'est là que tu mets tes variables permanentes et tes alias.
+
+<Analogy>
+L'environnement, c'est comme les réglages de ton smartphone. Tu ne les vois pas à l'écran quand tu utilises une app, mais ils influencent tout : la langue d'affichage, le fuseau horaire, le volume, le mode sombre. Les variables d'environnement font pareil pour ton terminal : elles définissent le contexte dans lequel tes commandes s'exécutent.
+</Analogy>
+
+<KeyConcept term="PATH">
+Une variable d'environnement qui contient une liste de répertoires séparés par des deux-points (ex: /usr/bin:/usr/local/bin:/home/user/.local/bin). Quand tu tapes une commande, le shell cherche l'exécutable dans chacun de ces dossiers, dans l'ordre. Si le programme n'est dans aucun dossier du PATH, le shell ne le trouve pas.
+</KeyConcept>
+
+<Example brand="Vercel">
+Quand tu déploies un projet sur Vercel, tu configures des variables d'environnement dans le dashboard (SUPABASE_URL, API_KEY, DATABASE_URL...). Ces variables sont injectées dans l'environnement du serveur qui fait tourner ton app. Le principe est exactement le même que dans ton terminal local : le programme lit les variables sans les stocker dans le code source.
+</Example>
+
+<Callout type="warning">
+Ne mets jamais de clés API ou de mots de passe directement dans ton code source. Utilise toujours des variables d'environnement (fichier .env en local, variables de config en production). Si tu push une clé API sur GitHub, des bots la détectent en quelques secondes et l'exploitent.
+</Callout>
+
+</Layer>
+
+<Layer id="commandes" order={5} title="Commandes" subtitle="Les programmes qu'on exécute" icon="Play">
+
+## Les briques de base de tout ce que tu fais
+
+Une commande, c'est un programme que le shell exécute. `ls` est un programme. `cat` est un programme. `git` est un programme. `node` est un programme. Chaque commande est un fichier exécutable stocké quelque part sur le disque, et le shell le retrouve grâce au PATH.
+
+Les commandes suivent toujours la même structure : `commande [options] [arguments]`. Par exemple, `ls -la /home` = commande `ls`, option `-la` (liste détaillée + fichiers cachés), argument `/home` (le dossier à lister). Les options commencent par `-` (format court) ou `--` (format long : `--all` au lieu de `-a`).
+
+Il existe des centaines de commandes préinstallées sur Linux. Les essentielles : `ls` (lister), `cd` (naviguer), `cat` (afficher), `cp` (copier), `mv` (déplacer), `rm` (supprimer), `mkdir` (créer un dossier), `chmod` (changer les permissions), `grep` (chercher du texte), `curl` (faire des requêtes HTTP). Maîtriser ces 10 commandes couvre 80% des besoins quotidiens.
+
+<Analogy>
+Les commandes, c'est comme les outils dans une boîte à outils. Chaque outil fait une chose précise : le marteau enfonce les clous, le tournevis visse, la scie coupe. En combinant les bons outils dans le bon ordre, tu peux construire n'importe quoi. Les commandes Linux fonctionnent pareil : simples individuellement, puissantes en combinaison.
+</Analogy>
+
+<KeyConcept term="Commande Linux">
+Un programme exécutable qui réalise une tâche spécifique. Les commandes sont les verbes du terminal — elles disent à la machine quoi faire. Elles prennent des options (comment le faire) et des arguments (sur quoi le faire). La philosophie Unix : chaque commande fait UNE chose, mais la fait bien.
+</KeyConcept>
+
+<Example brand="Claude Code">
+Quand tu utilises Claude Code dans ton terminal, Claude exécute les mêmes commandes Linux que toi : `cat` pour lire un fichier, `grep` pour chercher du texte, `git diff` pour voir les changements. Il n'a pas de super-pouvoirs magiques — il utilise les mêmes outils, mais plus vite et avec une meilleure connaissance de leur syntaxe. Comprendre les commandes de base te permet de comprendre ce que Claude Code fait sous le capot.
+</Example>
+
+</Layer>
+
+<Layer id="pipes-redirections" order={6} title="Pipes & Redirections" subtitle="Enchaîner et combiner des commandes" icon="GitBranch">
+
+## Le super-pouvoir du terminal
+
+Le pipe (`|`) est probablement le concept le plus puissant du terminal. Il prend la sortie d'une commande et la passe comme entrée à la commande suivante. Par exemple : `cat fichier.log | grep "ERROR" | wc -l` — cette chaîne lit un fichier, filtre les lignes contenant "ERROR", puis compte combien il y en a. Trois commandes simples, combinées en une action puissante.
+
+Les redirections permettent d'envoyer la sortie d'une commande ailleurs qu'à l'écran. `>` écrit dans un fichier (en écrasant), `>>` ajoute à la fin d'un fichier, `<` lit depuis un fichier. Par exemple : `echo "Hello" > salut.txt` crée un fichier contenant "Hello". `curl api.example.com >> log.txt` ajoute la réponse de l'API au fichier de log.
+
+C'est la philosophie Unix dans toute sa splendeur : des petits programmes spécialisés qui font chacun une seule chose, mais qu'on peut brancher ensemble comme des Legos. Pas besoin d'un gros logiciel monolithique qui fait tout mal. Tu assembles des micro-outils pour créer exactement ce dont tu as besoin.
+
+<Analogy>
+Les pipes, c'est comme une chaîne de montage en usine. Chaque station fait une seule opération : la première coupe le tissu, la deuxième le coud, la troisième ajoute les boutons, la quatrième emballe. Le produit passe de station en station, et chaque étape le transforme. Le résultat final est la combinaison de tous les petits traitements.
+</Analogy>
+
+<KeyConcept term="Pipe (|)">
+Un opérateur qui connecte la sortie standard (stdout) d'une commande à l'entrée standard (stdin) de la suivante. Il permet de chaîner des commandes simples pour créer des traitements avancés sans fichiers intermédiaires. C'est le fondement de la philosophie Unix "Do One Thing Well".
+</KeyConcept>
+
+<Example brand="Spotify">
+Les ingénieurs de Spotify utilisent des chaînes de pipes dans leurs scripts de déploiement et d'analyse. Par exemple, pour analyser les logs d'erreur de millions d'utilisateurs : `cat access.log | grep "500" | awk '{print $1}' | sort | uniq -c | sort -rn | head -20` — cette seule ligne extrait les 20 IPs qui génèrent le plus d'erreurs 500. Ce qui prendrait un programme dédié se fait en une ligne grâce aux pipes.
+</Example>
+
+</Layer>
+
+<Layer id="emulateur-terminal" order={7} title="Émulateur de terminal" subtitle="L'app graphique (iTerm, Windows Terminal)" icon="AppWindow">
+
+## La fenêtre qui fait le lien entre les deux mondes
+
+L'émulateur de terminal est l'application graphique que tu ouvres sur ton bureau pour accéder au monde textuel. Sur macOS c'est Terminal.app (ou iTerm2 si tu veux du confort), sur Windows c'est Windows Terminal, sur Linux c'est GNOME Terminal ou Konsole. C'est une fenêtre qui affiche du texte et capture tes frappes clavier.
+
+L'émulateur ne fait rien d'intelligent lui-même. Il ne comprend pas tes commandes. Il se contente de passer tes frappes au shell et d'afficher ce que le shell lui renvoie. C'est un intermédiaire visuel. Mais un bon émulateur fait une énorme différence en confort : onglets, split de fenêtres, recherche dans l'historique, thèmes de couleurs, transparence, raccourcis clavier.
+
+Le terminal intégré dans VS Code ou Cursor est aussi un émulateur de terminal. Il lance un shell (bash, zsh, PowerShell selon ton OS) et te permet de taper des commandes directement dans ton éditeur de code. C'est exactement le même concept, juste intégré dans un autre logiciel.
+
+<Analogy>
+L'émulateur de terminal, c'est comme l'application Téléphone sur ton smartphone. L'application elle-même ne passe pas l'appel — elle affiche juste une interface (un clavier, un écran). C'est le réseau téléphonique (le shell + le kernel) qui fait le vrai travail. Mais sans l'application, tu ne pourrais pas composer de numéro.
+</Analogy>
+
+<KeyConcept term="Émulateur de terminal">
+Un logiciel graphique qui simule le comportement d'un terminal physique. Il fournit une fenêtre où tu peux taper des commandes et voir les résultats. Il lance un shell en arrière-plan et joue le rôle de pont entre l'interface graphique (GUI) de ton OS et l'interface textuelle (CLI). Les plus populaires : iTerm2 (macOS), Windows Terminal, Alacritty, Warp.
+</KeyConcept>
+
+<Example brand="Microsoft">
+Windows Terminal, lancé en 2019, a été une mini-révolution. Avant, Windows n'avait que cmd.exe, un émulateur archaïque resté inchangé depuis les années 90. Windows Terminal a apporté les onglets, le support de PowerShell, WSL (Linux sous Windows), les thèmes, les raccourcis modernes. Microsoft l'a même rendu open source sur GitHub, preuve que le terminal redevient un outil central, même chez Microsoft.
+</Example>
+
+<Callout type="tip">
+Si tu es sur macOS, installe iTerm2 + Oh My Zsh + le thème Powerlevel10k. En 10 minutes de setup, tu passes d'un terminal basique à un outil magnifique avec autocomplétion intelligente, coloration syntaxique, et un prompt qui affiche la branche git, la version de Node, et le statut de tes commandes.
+</Callout>
+
+</Layer>
+
+</LayerStack>

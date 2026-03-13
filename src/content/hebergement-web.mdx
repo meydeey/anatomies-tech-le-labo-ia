@@ -1,0 +1,207 @@
+<LayerStack>
+
+<Layer id="serveur-physique" order={1} title="Serveur physique" subtitle="La machine dans le datacenter" icon="Server">
+
+## La ou tout commence
+
+Un site web, c'est des fichiers. Et ces fichiers doivent etre stockes quelque part et accessibles 24h/24. Ce "quelque part", c'est un serveur physique dans un datacenter. Un datacenter, c'est un batiment securise, climatise, avec des milliers de machines empilees sur des racks metalliques, connectees a Internet par des fibres optiques.
+
+Le serveur physique, c'est une machine specialisee concu pour tourner en permanence. Contrairement a ton PC, il n'a pas d'ecran, pas de clavier, pas de carte graphique gaming. Il a un processeur puissant, beaucoup de RAM, des disques rapides (SSD/NVMe), et une alimentation redondante (deux blocs d'alimentation au cas ou un lache).
+
+Quand tu paies un hebergement chez OVH, Hostinger ou Vercel, tu paies en realite une fraction du temps et des ressources d'une de ces machines. Plus tu paies, plus tu as de puissance a disposition.
+
+<Analogy>
+Le datacenter, c'est comme un immense parking couvert securise. Chaque place (serveur) peut accueillir un vehicule (site web). Le parking est surveille 24h/24, il est protege des intemperies, et il a sa propre alimentation electrique de secours. Tu loues une place, et ton vehicule est accessible en permanence.
+</Analogy>
+
+<KeyConcept term="Datacenter">
+Un batiment securise qui heberge des milliers de serveurs. Il garantit l'alimentation electrique (generateurs de secours), le refroidissement (les serveurs chauffent enormement), la securite physique (acces restreint), et la connectivite reseau (fibre optique haut debit). Les plus grands datacenters sont geres par AWS, Google, Microsoft et OVH.
+</KeyConcept>
+
+<Example brand="OVH">
+OVH, entreprise francaise basee a Roubaix, possede plus de 30 datacenters dans le monde. Quand tu prends un hebergement OVH, tes fichiers sont stockes sur un serveur physique dans un de ces datacenters. L'incendie de leur datacenter a Strasbourg en 2021 a rappele brutalement que "le cloud", ce sont des machines reelles qui peuvent bruler.
+</Example>
+
+</Layer>
+
+<Layer id="os-serveur" order={2} title="Systeme d'exploitation" subtitle="Linux/Windows Server" icon="Monitor">
+
+## Le logiciel qui fait vivre la machine
+
+Un serveur sans systeme d'exploitation, c'est une boite metallique inerte. L'OS (Operating System) est le premier logiciel installe sur la machine. Il gere le hardware (CPU, RAM, disques), execute les programmes, et gere les communications reseau.
+
+Dans le monde de l'hebergement web, Linux domine a plus de 80%. Pourquoi ? Il est gratuit (open source), stable, leger, securise, et toute l'infrastructure du web est construite pour tourner dessus. Les distributions les plus utilisees sont Ubuntu Server, Debian et CentOS/AlmaLinux.
+
+Windows Server existe aussi, principalement pour les applications Microsoft (.NET, SQL Server). Mais pour heberger un site Next.js, WordPress ou n8n, c'est Linux. Meme si tu ne le vois pas directement, l'OS tourne en arriere-plan et fait fonctionner tout le reste.
+
+<Analogy>
+L'OS du serveur, c'est comme le systeme nerveux d'un corps humain. Tu ne le vois pas, tu n'y penses jamais, mais sans lui, rien ne fonctionne. Il coordonne tous les organes (programmes), gere l'energie (CPU/RAM), et reagit aux stimuli (requetes reseau).
+</Analogy>
+
+<KeyConcept term="Linux Server">
+Un systeme d'exploitation open-source optimise pour les serveurs. Contrairement a Linux desktop (avec un bureau graphique), Linux server n'a souvent qu'une interface en ligne de commande. Il est leger, securise, et peut tourner des mois sans redemarrage. C'est le standard de l'industrie pour l'hebergement web.
+</KeyConcept>
+
+<Example brand="Vercel">
+Meme Vercel, qui te donne l'impression de ne pas avoir de serveur ("serverless"), utilise Linux en dessous. Tes fonctions Next.js s'executent sur des micro-VMs Linux dans les datacenters d'AWS. Vercel abstrait toute cette complexite : tu ne vois ni Linux, ni le serveur, ni le datacenter. Tu vois juste ton app qui tourne.
+</Example>
+
+</Layer>
+
+<Layer id="serveur-web" order={3} title="Serveur web (Nginx/Apache)" subtitle="Le logiciel qui sert les fichiers" icon="FileServer">
+
+## Le serveur du serveur
+
+Attention, ne confonds pas la machine (serveur physique) et le logiciel (serveur web). Le serveur web est un programme qui tourne sur la machine et dont le boulot est simple : recevoir des requetes HTTP et renvoyer des fichiers. Quand un navigateur demande `index.html`, c'est le serveur web qui trouve le fichier et l'envoie.
+
+Les deux serveurs web les plus utilises sont Nginx et Apache. Nginx est plus moderne, plus rapide et plus leger. Il gere aussi le reverse proxy (rediriger les requetes vers differentes applications), le load balancing (repartir la charge sur plusieurs serveurs) et la terminaison SSL.
+
+Dans les hebergements modernes (Vercel, Netlify), tu ne configures jamais le serveur web toi-meme. C'est automatique. Mais sur un VPS ou un hebergement classique, c'est toi qui installes et configures Nginx pour dire "quand quelqu'un demande monsite.com, sers les fichiers depuis /var/www/monsite".
+
+<Analogy>
+Le serveur web, c'est le serveur du restaurant (le metier, pas la machine). Le client (navigateur) passe commande (requete HTTP), le serveur va chercher le plat en cuisine (le fichier sur le disque), et le rapporte a la table (renvoie la reponse). Il ne cuisine pas lui-meme, il fait l'intermediaire.
+</Analogy>
+
+<KeyConcept term="Nginx">
+Un serveur web open-source ultra-performant. Il sert des fichiers statiques (HTML, CSS, JS, images), agit comme reverse proxy (rediriger les requetes vers Node.js, Python, etc.), et gere le HTTPS. C'est le serveur web le plus utilise au monde, devant Apache. Se prononce "engine-x".
+</KeyConcept>
+
+<Example brand="Cloudflare">
+Cloudflare Pages utilise son propre serveur web optimise pour servir des sites statiques depuis son reseau mondial de plus de 300 datacenters. Quand tu deploies un site sur Cloudflare Pages, leur serveur web sert tes fichiers depuis le datacenter le plus proche du visiteur. Un utilisateur a Tokyo recoit les fichiers depuis le Japon, pas depuis la France.
+</Example>
+
+</Layer>
+
+<Layer id="domaine-dns" order={4} title="Nom de domaine & DNS" subtitle="L'adresse humaine" icon="AtSign">
+
+## Transformer des chiffres en mots
+
+Ton serveur a une adresse IP (ex: `51.210.15.42`), mais personne ne va retenir ca. Le nom de domaine (monsite.com), c'est l'adresse lisible par les humains. Le DNS (Domain Name System), c'est le systeme qui traduit `monsite.com` en `51.210.15.42`.
+
+Tu achetes un nom de domaine chez un registrar (OVH, Namecheap, Google Domains). Ensuite, tu configures le DNS pour pointer ce nom vers l'adresse IP de ton serveur. C'est comme mettre un panneau avec le nom du restaurant devant la porte : les gens cherchent le nom, et le panneau les guide vers la bonne adresse.
+
+La configuration DNS se fait via des "enregistrements". Le plus important est le record A, qui lie directement un nom a une IP. Le record CNAME cree un alias (www.monsite.com pointe vers monsite.com). Le record MX configure les emails. Et le record TXT sert a la verification (prouver que tu es le proprietaire du domaine).
+
+<Analogy>
+Le DNS, c'est l'annuaire telephonique d'Internet. Tu cherches le nom (monsite.com), l'annuaire te donne le numero (adresse IP). Sans cet annuaire, tu devrais connaitre le numero par coeur pour appeler. Imagine retenir les numeros de telephone de 50 sites que tu visites chaque jour...
+</Analogy>
+
+<KeyConcept term="DNS (Domain Name System)">
+Le systeme mondial qui traduit les noms de domaine en adresses IP. Quand tu tapes une URL, ton navigateur interroge les serveurs DNS pour obtenir l'IP correspondante, puis contacte cette IP. La resolution DNS prend quelques millisecondes et est mise en cache pour accelerer les visites suivantes.
+</KeyConcept>
+
+<Example brand="Google">
+Google possede le domaine google.com, mais aussi des milliers de sous-domaines : mail.google.com (Gmail), drive.google.com, maps.google.com, cloud.google.com... Chacun pointe vers des serveurs differents grace au DNS. Un seul nom de domaine, des dizaines de services, tous geres par des enregistrements DNS distincts.
+</Example>
+
+<Callout type="info">
+Apres avoir modifie tes enregistrements DNS, il faut attendre la propagation (de quelques minutes a 48h). Pendant ce delai, certains visiteurs verront l'ancien site et d'autres le nouveau. C'est normal et inevitable.
+</Callout>
+
+</Layer>
+
+<Layer id="certificat-ssl" order={5} title="Certificat SSL" subtitle="Le cadenas HTTPS" icon="Lock">
+
+## Securiser la connexion
+
+Le certificat SSL (plus precisement TLS) est ce qui met le "S" dans HTTPS. Sans lui, les donnees circulent en clair entre le navigateur et le serveur : n'importe qui sur le reseau peut lire les mots de passe, numeros de carte bancaire, et messages prives. Avec SSL, tout est chiffre.
+
+Le certificat prouve deux choses : que le site est bien celui qu'il pretend etre (authentification), et que la connexion est chiffree (confidentialite). Un navigateur verifie le certificat a chaque connexion. S'il est invalide ou expire, le navigateur affiche un gros avertissement "Ce site n'est pas securise".
+
+Aujourd'hui, le SSL est gratuit grace a Let's Encrypt, une autorite de certification qui delivre des certificats automatiquement. Sur les hebergements modernes (Vercel, Netlify, Cloudflare), le SSL est configure automatiquement. Sur un VPS, des outils comme Certbot automatisent le processus.
+
+<Analogy>
+Le certificat SSL, c'est comme un sceau de cire sur une enveloppe au Moyen Age. Il prouve que la lettre vient bien de l'expediteur annonce (authentification), et si le sceau est intact, ca prouve que personne n'a ouvert l'enveloppe en chemin (integrite). Sans sceau, n'importe qui peut lire et modifier le courrier.
+</Analogy>
+
+<KeyConcept term="Certificat SSL/TLS">
+Un fichier cryptographique qui lie un nom de domaine a une paire de cles de chiffrement. Il est delivre par une autorite de certification (CA) qui verifie que tu es bien le proprietaire du domaine. Les certificats expirent (generalement apres 90 jours pour Let's Encrypt) et doivent etre renouveles.
+</KeyConcept>
+
+<Example brand="Let's Encrypt">
+Let's Encrypt, cree en 2015 par l'Internet Security Research Group, a revolutionne le web en rendant les certificats SSL gratuits et automatiques. Avant, un certificat coutait 50 a 300 dollars par an. Aujourd'hui, Let's Encrypt securise plus de 360 millions de sites web. C'est grace a eux que le HTTPS est devenu la norme.
+</Example>
+
+<Callout type="warning">
+Un site sans HTTPS est penalise par Google dans les resultats de recherche et affiche "Non securise" dans la barre d'adresse de Chrome. En 2026, il n'y a aucune raison de ne pas avoir le HTTPS. C'est gratuit et automatisable.
+</Callout>
+
+</Layer>
+
+<Layer id="fichiers-site" order={6} title="Fichiers du site" subtitle="HTML, CSS, JS, images" icon="FileCode">
+
+## Le contenu reel de ton site
+
+Au bout du compte, un site web ce sont des fichiers. Le navigateur telecharge ces fichiers et les interprete pour afficher une page. Les trois piliers sont : HTML (la structure), CSS (le style), et JavaScript (l'interactivite).
+
+Le HTML definit le contenu : les titres, les paragraphes, les images, les liens, les formulaires. Le CSS definit l'apparence : les couleurs, les tailles, les espacements, les animations. Le JavaScript ajoute le comportement : les clics, les formulaires dynamiques, le chargement de donnees.
+
+Dans les frameworks modernes comme Next.js, tu n'ecris pas directement du HTML, CSS et JS. Tu ecris du React (JSX) et du Tailwind (classes CSS), et le framework compile tout en fichiers optimises. Mais le resultat final reste toujours des fichiers HTML, CSS et JS que le navigateur sait lire.
+
+<Analogy>
+Les fichiers d'un site, c'est comme les materiaux d'une maison. Le HTML, ce sont les murs et la structure (ou vont les pieces, les portes, les fenetres). Le CSS, c'est la decoration (la peinture, le parquet, les rideaux). Le JavaScript, c'est l'electricite et la domotique (les interrupteurs, le chauffage automatique, les volets motorises).
+</Analogy>
+
+<KeyConcept term="Build / Bundle">
+Le processus qui transforme ton code source (React, TypeScript, Tailwind) en fichiers optimises (HTML, CSS, JS minifies) prets pour le navigateur. Des outils comme Next.js, Vite ou Webpack font ce travail. Le "build" produit un dossier de fichiers statiques que le serveur web peut servir directement.
+</KeyConcept>
+
+<Example brand="Nike">
+Le site nike.com est un excellent exemple de site web moderne. Derriere le design, c'est des milliers de fichiers : des images optimisees (WebP pour la legerete), du JavaScript pour le configurateur de chaussures (changer les couleurs en temps reel), du CSS pour les animations fluides, et du HTML pour la structure. Le tout est servi depuis un CDN mondial pour que le site charge en moins de 2 secondes partout.
+</Example>
+
+</Layer>
+
+<Layer id="cdn-cache" order={7} title="CDN & Cache" subtitle="Acceleration de la livraison" icon="Zap">
+
+## Rapprocher le contenu des utilisateurs
+
+Un CDN (Content Delivery Network) est un reseau mondial de serveurs qui stockent des copies de tes fichiers. Au lieu de tout servir depuis un seul serveur en France, tes fichiers sont dupliques sur des serveurs au Japon, au Bresil, aux USA, en Australie... Chaque visiteur recoit les fichiers depuis le serveur le plus proche de lui.
+
+Le cache, c'est le principe de garder en memoire quelque chose qu'on a deja demande pour ne pas avoir a aller le chercher a chaque fois. Le navigateur met en cache les fichiers CSS, JS et images pour ne pas les retelecharger a chaque visite. Le CDN met en cache les pages entieres pour ne pas interroger ton serveur d'origine a chaque requete.
+
+Le resultat : un site qui charge en 200ms au lieu de 2 secondes. La difference est enorme pour l'experience utilisateur et le SEO. Google penalise les sites lents dans ses resultats de recherche.
+
+<Analogy>
+Le CDN, c'est comme une chaine de librairies. Au lieu d'avoir une seule librairie a Paris ou tout le monde doit venir (le serveur d'origine), tu as des succursales dans chaque grande ville (les points de presence du CDN). Le lecteur a Lyon achete son livre a Lyon, pas a Paris. C'est plus rapide et ca decharge la librairie parisienne.
+</Analogy>
+
+<KeyConcept term="CDN (Content Delivery Network)">
+Un reseau de serveurs repartis dans le monde qui stockent des copies de ton contenu statique (images, CSS, JS). Quand un utilisateur accede a ton site, il est automatiquement redirige vers le serveur CDN le plus proche geographiquement. Les principaux CDN sont Cloudflare, Vercel Edge Network, AWS CloudFront et Fastly.
+</KeyConcept>
+
+<Example brand="Netflix">
+Netflix utilise son propre CDN appele Open Connect. Ils ont des serveurs physiques installes directement chez les fournisseurs d'acces Internet du monde entier. Quand tu lances une serie, le flux video vient d'un serveur a quelques kilometres de chez toi, pas d'un datacenter aux USA. C'est comme ca qu'ils livrent du 4K sans latence a 200 millions d'abonnes.
+</Example>
+
+<Callout type="tip">
+Vercel et Netlify incluent un CDN mondial dans leur offre gratuite. C'est un des gros avantages de ces plateformes : ton site Next.js est automatiquement distribue sur des dizaines de points de presence dans le monde, sans configuration.
+</Callout>
+
+</Layer>
+
+<Layer id="site-en-ligne" order={8} title="Le site en ligne" subtitle="Ce que voit l'utilisateur final" icon="Globe">
+
+## Le resultat de toutes les couches
+
+Voila, toutes les couches sont en place. L'utilisateur tape une URL, le DNS traduit le nom en IP, le navigateur etablit une connexion securisee (SSL), le serveur web (ou le CDN) renvoie les fichiers, et le navigateur les affiche. Tout ca se passe en moins d'une seconde. L'utilisateur ne voit qu'une page web, sans imaginer la complexite en dessous.
+
+L'experience utilisateur est la seule couche qui compte pour le visiteur. Il ne sait pas si ton site tourne sur un VPS OVH a 5 euros ou sur une infrastructure AWS a 5000 euros par mois. Il veut juste que la page se charge vite, que le contenu soit clair, et que les boutons fonctionnent.
+
+Mais toi, en tant que vibecoder, comprendre ces couches te donne un super-pouvoir. Quand ton site est lent, tu sais verifier le CDN. Quand il affiche "Non securise", tu sais que c'est le SSL. Quand il affiche une erreur 502, tu sais que c'est le serveur web ou l'application derriere. Tu passes de "ca marche pas" a "je sais pourquoi ca marche pas".
+
+<Analogy>
+Le site en ligne, c'est comme l'eau qui coule quand tu ouvres le robinet. Tu ne penses jamais au chateau d'eau, aux canalisations, a la station de traitement, aux pompes. Tu ouvres le robinet et l'eau coule. Toute l'infrastructure est invisible. Mais quand il n'y a plus d'eau, celui qui connait le systeme sait ou chercher le probleme.
+</Analogy>
+
+<KeyConcept term="Hebergement web">
+L'ensemble des couches techniques qui permettent de rendre un site accessible sur Internet : serveur physique, OS, serveur web, DNS, SSL, fichiers, et CDN. Les solutions d'hebergement vont du plus simple (Vercel, Netlify qui gerent tout) au plus complexe (VPS nu que tu configures toi-meme).
+</KeyConcept>
+
+<Example brand="Amazon">
+Amazon.com traite des millions de requetes par seconde. Derriere leur page d'accueil, il y a des centaines de milliers de serveurs, un CDN mondial (CloudFront), des certificats SSL, des serveurs web, et des datacenters sur tous les continents. Pourtant, pour le client qui achete une paire de chaussures, c'est juste un site web avec un bouton "Acheter". La complexite est entierement masquee.
+</Example>
+
+</Layer>
+
+</LayerStack>

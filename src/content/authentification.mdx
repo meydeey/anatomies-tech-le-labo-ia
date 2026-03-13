@@ -1,0 +1,215 @@
+<LayerStack>
+
+<Layer id="identite" order={1} title="Identité" subtitle="Qui es-tu ? (email, username)" icon="User">
+
+## Le point de départ : dire qui tu es
+
+Avant de pouvoir accéder à quoi que ce soit, un système a besoin de savoir **à qui il parle**. C'est la couche d'identité. Dans la vraie vie, c'est ton prénom quand tu te présentes à quelqu'un. Sur le web, c'est généralement ton email ou un nom d'utilisateur.
+
+L'identité, c'est juste une **déclaration** : "Je suis jean@email.com". À ce stade, le système ne te croit pas encore. N'importe qui pourrait taper cet email. C'est pour ça que l'identité seule ne suffit jamais -- il faut la **prouver** (c'est la couche suivante).
+
+Un détail important : l'identifiant doit être **unique**. Si deux personnes pouvaient avoir le même email dans un système, ce serait le chaos. C'est pourquoi tu reçois un "cet email est déjà utilisé" quand tu essaies de t'inscrire avec un email existant.
+
+<Analogy>
+Imagine que tu arrives à l'accueil d'un hôtel. Tu donnes ton nom au réceptionniste : "Bonjour, je suis Jean Dupont". C'est ta déclaration d'identité. Mais le réceptionniste ne va pas te donner la clé de la chambre juste parce que tu as dit un nom -- il va te demander une preuve (pièce d'identité, numéro de réservation).
+</Analogy>
+
+<KeyConcept term="Identifiant (Identifier)">
+Un identifiant est une information unique qui te distingue de tous les autres utilisateurs dans un système. Ça peut être un email, un username, un numéro de téléphone, ou même un UUID généré automatiquement. L'important, c'est qu'il soit unique : une entrée = une personne.
+</KeyConcept>
+
+<Example brand="Supabase Auth">
+Quand tu configures Supabase Auth, chaque utilisateur est identifié par un email ET un UUID interne. Tu peux retrouver un user avec `supabase.auth.getUser()` qui te renvoie un objet contenant `id` (UUID) et `email`. Même si l'utilisateur change son email plus tard, son UUID reste le même -- c'est l'identité permanente dans la base.
+</Example>
+
+</Layer>
+
+<Layer id="credential" order={2} title="Credential" subtitle="Comment le prouves-tu ? (password, clé)" icon="KeyRound">
+
+## La preuve : prouver que tu es bien toi
+
+Le credential, c'est la **preuve** que tu associes à ton identité. Le plus classique, c'est le mot de passe. Mais ça peut aussi être une clé SSH, une empreinte digitale, un code envoyé par SMS, ou même ta tête devant Face ID.
+
+On classe les credentials en trois catégories : **ce que tu sais** (mot de passe, code PIN), **ce que tu as** (téléphone, clé USB de sécurité), et **ce que tu es** (empreinte, visage). Le 2FA (Two-Factor Authentication) combine deux de ces catégories pour renforcer la sécurité.
+
+Le problème des mots de passe, c'est l'humain. Les gens réutilisent le même partout, choisissent "123456" ou le nom de leur chat. C'est pour ça que de plus en plus de services poussent vers le **passwordless** : magic links par email, codes OTP, ou passkeys.
+
+<Analogy>
+Le credential, c'est comme la clé de chez toi. Ton adresse (identité) est publique -- tout le monde peut la connaître. Mais seul celui qui possède la clé (credential) peut rentrer. Et si tu perds ta clé, tu ne perds pas ton appartement -- tu fais refaire une clé (reset password).
+</Analogy>
+
+<KeyConcept term="Credential">
+Un credential est toute information secrète qui permet de prouver une identité. Le mot de passe est le plus courant, mais les magic links, les codes OTP (One-Time Password), les clés de sécurité FIDO2 et les passkeys sont des alternatives plus sécurisées. Le principe reste le même : "quelque chose que seul le vrai propriétaire de cette identité devrait avoir".
+</KeyConcept>
+
+<Example brand="GitHub">
+GitHub permet de se connecter avec un mot de passe classique, mais pousse fortement vers le 2FA. Si tu actives le 2FA, après avoir entré ton mot de passe (ce que tu sais), tu dois aussi entrer un code depuis ton app d'authentification (ce que tu as). Deux facteurs = beaucoup plus difficile à pirater. GitHub supporte aussi les passkeys et les clés de sécurité physiques (YubiKey).
+</Example>
+
+<Callout type="warning">
+Ne stocke JAMAIS un mot de passe en clair dans ta base de données. Si ta base fuite (et ça arrive), tous les comptes sont compromis d'un coup. C'est là que le hachage entre en jeu (couche suivante).
+</Callout>
+
+</Layer>
+
+<Layer id="hachage" order={3} title="Hachage" subtitle="Stocker le mot de passe sans le stocker (bcrypt)" icon="Hash">
+
+## L'art de stocker un secret sans le connaître
+
+Le hachage, c'est un tour de magie mathématique : tu transformes un mot de passe en une **chaîne de caractères illisible**, et il est **impossible** de faire le chemin inverse. Le système ne connaît jamais ton vrai mot de passe -- il ne stocke que le hash.
+
+Quand tu crées ton compte avec le mot de passe "MonChat2024", le système le passe dans une fonction de hachage (comme bcrypt) et obtient quelque chose comme `$2b$10$N9qo8uLOickgx2ZMRZoMye...`. C'est ça qui est stocké en base. Même si un hacker vole la base, il ne peut pas retrouver les mots de passe originaux.
+
+Le sel (salt) est un ingrédient crucial. C'est une chaîne aléatoire ajoutée au mot de passe avant le hachage. Sans sel, deux utilisateurs avec le même mot de passe auraient le même hash -- ce qui permettrait des attaques par "rainbow table" (tables pré-calculées de hash).
+
+<Analogy>
+Imagine un hachoir à viande. Tu mets un steak dedans, tu obtiens de la viande hachée. Impossible de reconstituer le steak original à partir de la viande hachée. Le hachage fonctionne pareil : password -> hash est facile, hash -> password est impossible. Et le sel, c'est comme ajouter des épices différentes pour chaque steak -- même deux steaks identiques donnent un résultat différent.
+</Analogy>
+
+<KeyConcept term="Hachage (Hashing)">
+Le hachage est une fonction mathématique à sens unique qui transforme une entrée de n'importe quelle taille en une sortie de taille fixe. Les algorithmes modernes comme bcrypt, scrypt ou Argon2 sont spécialement conçus pour être **lents** (oui, c'est voulu !) -- ça rend les attaques par force brute impraticables. Un bon hash prend ~100ms à calculer, ce qui est invisible pour un login mais rend le brute force de millions de combinaisons impossible.
+</KeyConcept>
+
+<Example brand="Supabase Auth">
+Quand tu crées un utilisateur via Supabase Auth (`supabase.auth.signUp()`), le mot de passe est automatiquement haché avec bcrypt avant d'être stocké dans la table `auth.users`. Tu n'as rien à faire -- Supabase gère le sel, le nombre de rounds et le stockage. Si tu regardes la table directement, tu verras la colonne `encrypted_password` remplie de hash illisibles. Même les admins Supabase ne peuvent pas voir les vrais mots de passe.
+</Example>
+
+</Layer>
+
+<Layer id="verification" order={4} title="Vérification" subtitle="Comparer le hash" icon="CheckCircle">
+
+## Le moment de vérité : est-ce bien toi ?
+
+Quand tu te connectes, le système prend le mot de passe que tu viens de taper, le hache avec le même algorithme et le même sel, puis **compare** le résultat avec le hash stocké en base. Si les deux hash correspondent, c'est que tu as tapé le bon mot de passe. Sinon, accès refusé.
+
+C'est élégant parce que le système n'a jamais besoin de "décrypter" quoi que ce soit. Il ne compare que des hash. Même pendant la vérification, ton vrai mot de passe n'existe en mémoire que quelques millisecondes avant d'être haché.
+
+Cette étape inclut souvent des protections supplémentaires : limitation du nombre de tentatives (rate limiting), CAPTCHA après plusieurs échecs, blocage temporaire du compte. Tout ça pour empêcher les attaques par force brute.
+
+<Analogy>
+C'est comme un coffre-fort à combinaison. Tu ne peux pas ouvrir le coffre pour vérifier si la combinaison est "la même" -- tu tournes les molettes, et soit le coffre s'ouvre (combinaison correcte), soit il reste fermé (mauvaise combinaison). Le coffre ne te dit jamais quelle est la bonne combinaison, il te dit juste "oui" ou "non".
+</Analogy>
+
+<KeyConcept term="Vérification par comparaison de hash">
+Le processus de vérification ne "déchiffre" jamais le hash stocké (c'est impossible). Il hache la tentative de l'utilisateur et compare les deux hash. Cette comparaison utilise une fonction "constant-time" pour éviter les timing attacks -- une attaque où un hacker mesure le temps de réponse pour deviner les caractères un par un.
+</KeyConcept>
+
+<Example brand="NextAuth.js">
+Avec NextAuth (maintenant Auth.js), tu configures un `CredentialsProvider` qui reçoit email et password. Dans la fonction `authorize`, tu cherches l'utilisateur en base, puis tu compares avec `bcrypt.compare(inputPassword, storedHash)`. Si ça matche, tu renvoies l'objet user. Si non, tu renvoies `null` et NextAuth affiche l'erreur. Tout le flow de vérification est dans cette seule fonction.
+</Example>
+
+<Callout type="tip">
+Toujours renvoyer le même message d'erreur ("Email ou mot de passe incorrect") que ce soit l'email ou le mot de passe qui est faux. Si tu dis "cet email n'existe pas", tu donnes une info gratuite aux attaquants -- ils savent quels emails sont enregistrés.
+</Callout>
+
+</Layer>
+
+<Layer id="session-token" order={5} title="Session / Token" subtitle="Le bracelet du festival (JWT, cookie)" icon="Ticket">
+
+## Rester connecté sans redonner son mot de passe
+
+Une fois la vérification passée, le serveur te donne un **token** -- une preuve temporaire que tu es authentifié. Sans ça, tu devrais retaper ton mot de passe à chaque clic. Ce token est stocké côté client (dans un cookie ou le localStorage) et envoyé automatiquement avec chaque requête.
+
+Il existe deux grandes approches : les **sessions** côté serveur (le serveur garde en mémoire "ce token correspond à cet utilisateur") et les **JWT** (le token lui-même contient les informations de l'utilisateur, signé cryptographiquement). Les JWT sont plus populaires aujourd'hui parce qu'ils sont "stateless" -- le serveur n'a rien à stocker.
+
+Un JWT se compose de trois parties séparées par des points : le header (algorithme), le payload (tes données : user id, email, rôle, date d'expiration) et la signature (preuve que personne n'a modifié le contenu). Tu peux décoder un JWT sur jwt.io pour voir ce qu'il contient -- c'est juste du Base64.
+
+<Analogy>
+C'est exactement comme le bracelet d'un festival. À l'entrée, tu montres ton billet (login), on vérifie ton identité, puis on te met un bracelet au poignet (token). Après ça, tu montres juste ton bracelet pour accéder aux scènes, aux bars, etc. Le bracelet a une date d'expiration (fin du festival), et si tu le coupes, tu dois retourner à l'entrée (re-login).
+</Analogy>
+
+<KeyConcept term="JWT (JSON Web Token)">
+Un JWT est un token autoporteur qui contient les informations de l'utilisateur encodées en JSON, signées avec une clé secrète. Il se compose de trois parties : Header.Payload.Signature. L'avantage : le serveur n'a pas besoin de stocker les sessions -- il vérifie juste la signature. L'inconvénient : un JWT volé est utilisable jusqu'à son expiration. C'est pourquoi on utilise des access tokens courts (15 min) et des refresh tokens longs (7 jours).
+</KeyConcept>
+
+<Example brand="Supabase Auth">
+Supabase Auth utilise des JWT sous le capot. Quand tu appelles `supabase.auth.signInWithPassword()`, tu reçois un `access_token` (JWT valide 1h) et un `refresh_token` (valide 1 semaine). Le client Supabase gère automatiquement le refresh : quand l'access token expire, il utilise le refresh token pour en obtenir un nouveau, sans que l'utilisateur ne s'en rende compte. Tu peux inspecter le JWT avec `supabase.auth.getSession()`.
+</Example>
+
+</Layer>
+
+<Layer id="autorisation" order={6} title="Autorisation" subtitle="Qu'as-tu le droit de faire ? (roles, permissions)" icon="Shield">
+
+## Authentifié ne veut pas dire autorisé
+
+L'authentification répond à "qui es-tu ?". L'autorisation répond à "qu'as-tu le **droit** de faire ?". Ce sont deux choses complètement différentes. Tu peux être connecté à un système (authentifié) mais ne pas avoir le droit de supprimer des utilisateurs (pas autorisé).
+
+Le modèle le plus courant est le **RBAC** (Role-Based Access Control) : chaque utilisateur a un rôle (admin, editor, viewer), et chaque rôle a des permissions définies. C'est simple et ça couvre 90% des cas. Pour les cas plus complexes, il existe l'ABAC (Attribute-Based Access Control) qui prend en compte des attributs comme le département, l'heure, la localisation.
+
+La vraie difficulté de l'autorisation, c'est de la vérifier **partout**. Pas juste dans l'interface (cacher un bouton), mais aussi dans l'API. Si tu caches le bouton "Supprimer" pour les non-admins mais que l'endpoint `DELETE /api/users/:id` ne vérifie pas le rôle, n'importe qui peut supprimer un utilisateur avec un simple `curl`.
+
+<Analogy>
+Dans un hôpital, tout le monde a un badge pour entrer (authentification). Mais les chirurgiens ont accès au bloc opératoire, les infirmiers aux chambres des patients, et le comptable uniquement au service financier. Le badge prouve qui tu es, mais c'est ton rôle qui détermine où tu peux aller.
+</Analogy>
+
+<KeyConcept term="RBAC (Role-Based Access Control)">
+Le RBAC est un modèle d'autorisation où les permissions sont attribuées à des rôles, et les rôles sont attribués aux utilisateurs. Au lieu de dire "Jean peut éditer les articles", on dit "les éditeurs peuvent éditer les articles" et "Jean est éditeur". Ça simplifie la gestion : quand un nouvel éditeur arrive, tu lui donnes le rôle, pas 47 permissions individuelles.
+</KeyConcept>
+
+<Example brand="Supabase">
+Supabase utilise les Row Level Security (RLS) policies de PostgreSQL pour gérer l'autorisation directement au niveau de la base de données. Tu écris des règles comme "un utilisateur ne peut lire que ses propres lignes" : `CREATE POLICY "Users can view own data" ON profiles FOR SELECT USING (auth.uid() = user_id)`. Même si quelqu'un contourne ton API, la base de données elle-même refuse l'accès. C'est la défense ultime.
+</Example>
+
+<Callout type="warning">
+Ne fais JAMAIS confiance au frontend pour l'autorisation. Cacher un bouton dans l'interface n'est pas une sécurité -- c'est juste du confort UX. Toute vérification de permission doit être faite côté serveur (API ou base de données).
+</Callout>
+
+</Layer>
+
+<Layer id="oauth-sso" order={7} title="OAuth / SSO" subtitle="Se connecter via Google, GitHub" icon="LogIn">
+
+## Déléguer la connexion à quelqu'un de confiance
+
+OAuth, c'est le système qui te permet de cliquer "Se connecter avec Google" au lieu de créer un énième compte. L'idée est simple : au lieu de gérer toi-même les credentials de l'utilisateur, tu délègues à un fournisseur d'identité (Google, GitHub, Apple) qui s'en charge déjà.
+
+Le flow OAuth fonctionne en plusieurs étapes. Ton app redirige l'utilisateur vers Google. Google demande "voulez-vous autoriser cette app à accéder à votre email ?". L'utilisateur accepte. Google redirige vers ton app avec un **code temporaire**. Ton serveur échange ce code contre un access token directement auprès de Google. Ce token te donne accès aux infos de l'utilisateur (email, nom, photo).
+
+Le SSO (Single Sign-On) va plus loin : tu te connectes une seule fois, et tu as accès à plein de services. Quand tu te connectes à Gmail, tu es automatiquement connecté à YouTube, Google Drive, Google Calendar -- c'est du SSO.
+
+<Analogy>
+OAuth, c'est comme entrer dans un immeuble sécurisé en disant "je suis avec Pierre qui habite au 3e". Le gardien (ton app) appelle Pierre (Google) pour vérifier. Pierre confirme : "oui, il est avec moi, laissez-le entrer". Tu n'as jamais eu besoin de donner tes propres infos au gardien.
+</Analogy>
+
+<KeyConcept term="OAuth 2.0">
+OAuth 2.0 est un protocole d'autorisation qui permet à une application tierce d'obtenir un accès limité au compte d'un utilisateur sur un autre service, sans que l'utilisateur ne partage son mot de passe. Les rôles clés : le Resource Owner (l'utilisateur), le Client (ton app), l'Authorization Server (Google) et le Resource Server (l'API Google). Le flow "Authorization Code" est le plus sécurisé pour les apps web.
+</KeyConcept>
+
+<Example brand="Supabase Auth">
+Configurer Google OAuth avec Supabase prend 5 minutes. Tu crées des credentials dans Google Cloud Console, tu colles le Client ID et Secret dans Supabase Dashboard > Authentication > Providers > Google, et dans ton code tu appelles `supabase.auth.signInWithOAuth({ provider: 'google' })`. Supabase gère tout le flow OAuth, crée l'utilisateur dans `auth.users` s'il n'existe pas, et te renvoie un JWT. Tu as aussi GitHub, Discord, Apple, et plus de 20 providers disponibles.
+</Example>
+
+</Layer>
+
+<Layer id="flux-complet" order={8} title="Flux complet" subtitle="Login, accès, refresh, logout" icon="RefreshCw">
+
+## Le cycle de vie complet d'une session
+
+Maintenant tu connais toutes les couches, voyons comment elles s'enchaînent dans la vraie vie. Le flux complet d'authentification est un cycle qui tourne en boucle tant que l'utilisateur est actif.
+
+**Login** : l'utilisateur entre son email (identité) et son mot de passe (credential). Le serveur hache le mot de passe et compare avec le hash stocké (vérification). Si c'est bon, le serveur génère un access token (JWT, courte durée) et un refresh token (longue durée), stockés dans des cookies httpOnly.
+
+**Accès** : à chaque requête, le client envoie l'access token. Le serveur vérifie la signature et l'expiration du JWT, extrait le rôle de l'utilisateur, et vérifie les permissions (autorisation). Si tout est OK, la requête est traitée.
+
+**Refresh** : quand l'access token expire (souvent après 15 min à 1h), le client utilise automatiquement le refresh token pour en obtenir un nouveau. L'utilisateur ne voit rien -- c'est transparent. Si le refresh token lui-même a expiré, retour au login.
+
+**Logout** : le client supprime les tokens côté client et idéalement notifie le serveur pour invalider le refresh token côté serveur. C'est là que les JWT montrent leur limite : un access token reste valide jusqu'à son expiration, même après un logout. D'où l'importance d'une durée de vie courte.
+
+<Analogy>
+C'est comme une journée dans un parc d'attractions. Tu achètes ton billet (login), on te donne un bracelet (token). Tu accèdes aux attractions toute la journée (accès). Si ton bracelet commence à se décoller, tu passes au guichet pour un renforcement (refresh). En partant, tu jettes ton bracelet (logout). Le lendemain, il te faudra un nouveau billet.
+</Analogy>
+
+<KeyConcept term="Refresh Token Rotation">
+La rotation de refresh tokens est une technique de sécurité où chaque utilisation d'un refresh token le remplace par un nouveau. Si un attaquant vole un ancien refresh token et essaie de l'utiliser, le serveur détecte l'anomalie (un token déjà utilisé) et invalide toute la famille de tokens, forçant l'utilisateur à se reconnecter. C'est une protection contre le vol de tokens.
+</KeyConcept>
+
+<Example brand="Netflix">
+Quand tu te connectes à Netflix, tu restes connecté pendant des semaines sur ta TV. C'est grâce au refresh token rotation. En arrière-plan, Netflix renouvelle silencieusement tes tokens. Mais quand tu changes ton mot de passe, Netflix déconnecte tous les appareils -- il invalide tous les refresh tokens existants. C'est aussi ce qui se passe quand tu cliques "Se déconnecter de tous les appareils" dans les paramètres.
+</Example>
+
+<Callout type="info">
+L'authentification est une chaîne : elle est aussi forte que son maillon le plus faible. Un hachage parfait ne sert à rien si les tokens sont stockés en localStorage (vulnérable au XSS). Des tokens sécurisés ne servent à rien si le mot de passe est "password123". Chaque couche renforce les autres.
+</Callout>
+
+</Layer>
+
+</LayerStack>

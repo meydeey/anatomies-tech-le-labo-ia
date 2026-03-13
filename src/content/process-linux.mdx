@@ -1,0 +1,207 @@
+<LayerStack>
+
+<Layer id="programme-disque" order={1} title="Programme sur le disque" subtitle="Le fichier exécutable" icon="File">
+
+## Le plan avant l'action
+
+Un programme, c'est un fichier stocké sur ton disque dur. Il contient des instructions écrites par un développeur, compilées en langage machine (des 0 et des 1 que le processeur comprend). Tant que ce fichier reste sur le disque sans être exécuté, c'est juste un fichier comme un autre. Il ne consomme ni CPU ni RAM. Il attend.
+
+Sur Linux, les programmes sont souvent rangés dans des dossiers standardisés : `/usr/bin` pour les programmes système, `/usr/local/bin` pour ceux installés manuellement, `/snap/bin` pour les snaps, `~/.local/bin` pour tes programmes personnels. Quand tu tapes `node` dans le terminal, le shell cherche un fichier exécutable appelé `node` dans ton PATH.
+
+La différence entre un programme et un process est fondamentale. Le programme est la recette écrite dans le livre de cuisine. Le process, c'est quand tu ouvres le livre et que tu commences à cuisiner. Un même programme peut donner naissance à plusieurs processes en même temps (plusieurs instances de Node.js, par exemple).
+
+<Analogy>
+Un programme sur le disque, c'est comme une partition musicale posée sur un pupitre. Tant que personne ne la joue, ce ne sont que des notes écrites sur du papier. La partition ne produit aucun son, ne consomme aucune énergie. Ce n'est que lorsqu'un musicien (le processeur) la lit et joue les notes que la musique (le process) existe vraiment.
+</Analogy>
+
+<KeyConcept term="Programme (exécutable)">
+Un fichier stocké sur le disque contenant des instructions machine. C'est une entité passive — il ne fait rien tant qu'il n'est pas lancé. Quand le système l'exécute, il crée un process en chargeant les instructions en mémoire. Un programme peut engendrer plusieurs processes simultanément.
+</KeyConcept>
+
+<Example brand="Docker">
+Quand tu installes Docker, le programme `dockerd` est un fichier binaire stocké dans `/usr/bin/dockerd`. Il ne fait rien tant que tu ne le lances pas. Mais quand systemd l'exécute au démarrage, il devient un process actif qui écoute les commandes Docker, gère les conteneurs, et consomme de la RAM et du CPU. Le fichier sur le disque fait quelques dizaines de Mo. Le process en mémoire peut consommer des Go selon les conteneurs qu'il gère.
+</Example>
+
+</Layer>
+
+<Layer id="chargement-memoire" order={2} title="Chargement en mémoire" subtitle="Le programme devient process" icon="MemoryStick">
+
+## La naissance d'un process
+
+Quand tu exécutes un programme (en tapant une commande ou en cliquant sur un lanceur), le kernel Linux copie les instructions du fichier depuis le disque vers la RAM. Il lui alloue un espace mémoire dédié, divisé en segments : le code (les instructions), les données (les variables), la pile (stack, pour les appels de fonctions) et le tas (heap, pour l'allocation dynamique).
+
+Ce moment est la transformation du programme en process. Le programme statique devient un programme vivant, avec son propre espace mémoire isolé. Si tu lances le même programme deux fois, tu obtiens deux processes séparés, chacun avec sa propre copie en mémoire. Ils ne se voient pas, ne se perturbent pas.
+
+Le kernel garde une trace de chaque process dans une structure appelée la "table des processus". C'est un registre qui contient tout ce qu'il faut savoir sur chaque process : qui l'a lancé, combien de mémoire il utilise, quel est son état actuel, quels fichiers il a ouverts. C'est le registre d'état civil des programmes vivants.
+
+<Analogy>
+Le chargement en mémoire, c'est comme un acteur qui passe du script (le programme sur le disque) à la scène (la RAM). Le script est le même pour chaque représentation, mais chaque performance est unique : l'acteur évolue, improvise, réagit en temps réel. Deux acteurs peuvent jouer le même rôle en même temps sur deux scènes différentes — deux processes du même programme.
+</Analogy>
+
+<KeyConcept term="Mémoire virtuelle">
+Un système par lequel le kernel donne à chaque process l'illusion qu'il dispose de toute la mémoire de la machine pour lui seul. En réalité, le kernel mappe les adresses mémoire virtuelles du process vers des adresses physiques en RAM. Cela garantit l'isolation : un process ne peut jamais lire ou écrire dans la mémoire d'un autre process.
+</KeyConcept>
+
+<Example brand="Google Chrome">
+Quand tu ouvres Chrome et que tu as 20 onglets ouverts, chaque onglet est un process séparé. Chrome lance un nouveau process pour chaque onglet. C'est pour ça que Chrome consomme tant de RAM : chaque process a sa propre copie du moteur de rendu en mémoire. Mais l'avantage est l'isolation : si un onglet plante (un site bugué), les autres onglets continuent de fonctionner normalement.
+</Example>
+
+</Layer>
+
+<Layer id="pid" order={3} title="PID" subtitle="Le numéro d'identité du process" icon="Hash">
+
+## Le numéro de sécu de chaque programme
+
+Dès qu'un process naît, le kernel lui attribue un PID (Process IDentifier) — un numéro unique qui l'identifie. Le premier process qui démarre sur Linux (init ou systemd) a toujours le PID 1. Chaque process suivant reçoit un numéro croissant : 2, 3, 4... jusqu'à des dizaines de milliers.
+
+Le PID est essentiel pour interagir avec un process. Pour arrêter un programme qui ne répond plus, tu as besoin de son PID. `kill 12345` envoie un signal d'arrêt au process numéro 12345. `kill -9 12345` le tue de force. Sans le PID, tu ne peux pas cibler un process spécifique.
+
+Tu peux voir les PIDs de tous les processes qui tournent avec la commande `ps aux` ou `top`. Chaque ligne représente un process, avec son PID, l'utilisateur qui l'a lancé, la consommation CPU et RAM, et la commande d'origine. C'est comme un tableau de bord en temps réel de tout ce qui tourne sur ta machine.
+
+<Analogy>
+Le PID, c'est comme le numéro de dossard dans un marathon. Chaque coureur (process) reçoit un numéro unique au départ. Ce numéro permet aux organisateurs (le kernel) de suivre sa position, son temps, et de le disqualifier si nécessaire. Sans dossard, impossible de distinguer un coureur d'un autre dans la foule.
+</Analogy>
+
+<KeyConcept term="PID (Process IDentifier)">
+Un nombre entier unique attribué par le kernel à chaque process au moment de sa création. Le PID 1 est toujours le process init/systemd (le premier lancé au boot). Les PIDs sont recyclés quand un process se termine. C'est l'identifiant qu'on utilise pour surveiller, contrôler ou arrêter un process spécifique.
+</KeyConcept>
+
+<Example brand="Netflix">
+Les serveurs Netflix font tourner des milliers de processes simultanément. Chaque micro-service (recommandation, streaming, authentification) génère ses propres processes avec leurs PIDs. Leur système de monitoring (Atlas) suit les PIDs pour détecter les processes qui consomment trop de ressources ou qui crashent. Si un process de streaming plante (disons le PID 8742), le système le détecte via son PID et le redémarre automatiquement en quelques secondes.
+</Example>
+
+</Layer>
+
+<Layer id="etats-process" order={4} title="États du process" subtitle="Running, sleeping, stopped, zombie" icon="Activity">
+
+## La vie mouvementée d'un process
+
+Un process n'est pas toujours en train de calculer. Il passe par plusieurs états au cours de sa vie. **Running** (R) : il est en train d'utiliser le CPU. **Sleeping** (S) : il attend quelque chose (une réponse réseau, une lecture disque, un timer). **Stopped** (T) : il a été mis en pause (par un signal SIGSTOP ou Ctrl+Z). **Zombie** (Z) : il a fini de s'exécuter mais son parent n'a pas encore récupéré son code de sortie.
+
+En pratique, la majorité des processes sont en état Sleeping la plupart du temps. Un serveur web Nginx, par exemple, passe 99,9% de son temps à dormir en attendant une requête. Quand une requête arrive, il passe en Running pendant quelques microsecondes pour la traiter, puis retourne dormir. C'est extrêmement efficace.
+
+L'état Zombie est le plus mystérieux. Un process zombie est mort, mais son entrée dans la table des processus existe encore. C'est comme un fantôme administratif — le travail est fini, mais la paperasse n'a pas été récupérée par le process parent. Quelques zombies, c'est normal. Des centaines de zombies, c'est un bug dans le programme parent.
+
+<Analogy>
+Les états d'un process, c'est comme un employé au bureau. Running : il est en train de bosser sur un dossier. Sleeping : il attend une réponse par email pour continuer (il ne bloque pas le bureau, il fait autre chose en attendant). Stopped : il est en pause déjeuner. Zombie : il a fini sa journée et est parti, mais ses fiches de présence n'ont pas encore été signées par le manager.
+</Analogy>
+
+<KeyConcept term="Process Zombie">
+Un process qui a terminé son exécution mais dont l'entrée reste dans la table des processus parce que son process parent n'a pas encore appelé wait() pour récupérer son code de retour. Un zombie ne consomme ni CPU ni RAM, juste un slot dans la table des processus. Trop de zombies signifie un bug dans le programme parent.
+</KeyConcept>
+
+<Example brand="Slack">
+L'application desktop de Slack lance plusieurs processes pour gérer les différentes fonctionnalités : un pour l'interface, un pour les notifications, un pour les appels audio. Quand tu reçois un message, le process de notification passe brièvement de Sleeping à Running pour afficher la notification, puis retourne en Sleeping. Si tu mets Slack en arrière-plan, certains processes passent en état quasi-dormant pour économiser les ressources de ton Mac.
+</Example>
+
+<Callout type="info">
+Tu peux voir l'état de chaque process avec la commande `ps aux`. La colonne STAT indique l'état : R (running), S (sleeping), T (stopped), Z (zombie), D (uninterruptible sleep — il attend une opération disque critique). Un process en état D ne peut même pas être tué avec `kill -9`.
+</Callout>
+
+</Layer>
+
+<Layer id="arbre-processus" order={5} title="Arbre de processus" subtitle="Parent, enfants, init/systemd" icon="GitBranch">
+
+## La famille des programmes
+
+Chaque process (sauf le tout premier) est créé par un autre process. Le process créateur est le "parent", le process créé est "l'enfant". Cette relation forme un arbre : systemd (PID 1) est la racine, et tous les autres processes en descendent directement ou indirectement.
+
+Quand tu ouvres un terminal et que tu tapes `node server.js`, voici l'arbre : systemd a lancé le gestionnaire de bureau, qui a lancé ton émulateur de terminal, qui a lancé Zsh (ton shell), qui a lancé Node.js. Chaque maillon est le parent du suivant. Tu peux visualiser cet arbre avec la commande `pstree`.
+
+Cette hiérarchie a des conséquences pratiques. Si un process parent meurt, ses enfants deviennent "orphelins" et sont automatiquement adoptés par systemd (PID 1). Si tu fermes ton terminal, tous les processes lancés depuis ce terminal reçoivent un signal de mort (SIGHUP). C'est pour ça que `nohup` et `screen`/`tmux` existent : ils permettent de détacher un process de son terminal pour qu'il survive à la fermeture.
+
+<Analogy>
+L'arbre de processus, c'est comme un arbre généalogique. Le fondateur de la famille (systemd, PID 1) a des enfants (les services système), qui ont eux-mêmes des enfants (les applications), qui peuvent avoir des petits-enfants (les sous-processes). Si un parent décède, les enfants sont adoptés par le patriarche (systemd). La lignée ne s'interrompt jamais.
+</Analogy>
+
+<KeyConcept term="fork()">
+L'appel système qui crée un nouveau process en dupliquant le process actuel. Le process original devient le parent, la copie devient l'enfant. L'enfant hérite de la mémoire, des fichiers ouverts et de l'environnement du parent. C'est le mécanisme fondamental de création de processes sous Linux. Quand tu lances une commande dans le shell, le shell fait un fork() puis exécute ta commande dans le process enfant.
+</KeyConcept>
+
+<Example brand="Nginx">
+Nginx utilise un modèle master-worker basé sur l'arbre de processus. Le process master (parent) démarre avec les privilèges root, lit la configuration, puis crée plusieurs processes workers (enfants) qui traitent les requêtes web. Si un worker plante, le master en crée un nouveau. Si tu recharges la config (nginx -s reload), le master crée de nouveaux workers avec la nouvelle config et arrête proprement les anciens. Tout repose sur la relation parent-enfant.
+</Example>
+
+</Layer>
+
+<Layer id="signaux" order={6} title="Signaux" subtitle="Les messages entre processes (SIGTERM, SIGKILL)" icon="Bell">
+
+## Le système de messagerie des programmes
+
+Les signaux sont des messages courts que le kernel ou un process peut envoyer à un autre process. Ce ne sont pas des données — ce sont des notifications. "Arrête-toi proprement" (SIGTERM), "Meurs immédiatement" (SIGKILL), "Mets-toi en pause" (SIGSTOP), "Reprends" (SIGCONT), "Ton terminal a été fermé" (SIGHUP).
+
+SIGTERM (signal 15) est le signal poli. Il dit au process : "J'aimerais que tu t'arrêtes. Sauvegarde tes données, ferme tes connexions, fais le ménage, puis quitte." Le process peut intercepter ce signal et faire un shutdown propre. C'est ce que `kill PID` envoie par défaut.
+
+SIGKILL (signal 9) est le signal brutal. Il ne peut pas être intercepté, ignoré ou bloqué. Le kernel tue le process immédiatement, sans lui laisser le temps de sauvegarder quoi que ce soit. C'est l'arme de dernier recours, quand un process ne répond plus à SIGTERM. `kill -9 PID` envoie SIGKILL. À utiliser avec précaution car il peut laisser des fichiers corrompus ou des verrous non libérés.
+
+<Analogy>
+Les signaux, c'est comme les messages dans un bureau. SIGTERM, c'est un email du patron qui dit "range ton bureau et rentre chez toi à la fin de la journée". Le process a le temps de finir proprement. SIGKILL, c'est la sécurité qui débarque et te met dehors immédiatement — tu n'as même pas le temps de prendre ta veste. Ctrl+C (SIGINT), c'est un collègue qui tape sur ton épaule pour te dire "laisse tomber ce que tu fais".
+</Analogy>
+
+<KeyConcept term="Signal Unix">
+Un mécanisme de communication asynchrone entre processes (ou entre le kernel et un process). Chaque signal a un numéro et un nom. Les plus importants : SIGTERM (15, arrêt propre), SIGKILL (9, arrêt forcé), SIGINT (2, interruption par Ctrl+C), SIGHUP (1, terminal fermé), SIGSTOP (19, pause), SIGCONT (18, reprise). Un process peut définir un handler pour la plupart des signaux, sauf SIGKILL et SIGSTOP.
+</KeyConcept>
+
+<Example brand="Kubernetes">
+Kubernetes utilise les signaux pour gérer le cycle de vie des conteneurs. Quand Kubernetes veut arrêter un pod, il envoie d'abord SIGTERM au process principal du conteneur et lui laisse 30 secondes (configurable) pour s'arrêter proprement. Si le process n'est toujours pas mort après ce délai, Kubernetes envoie SIGKILL. Ce mécanisme garantit un arrêt gracieux des services : les connexions en cours sont terminées, les données sont sauvegardées, les files d'attente sont vidées.
+</Example>
+
+<Callout type="warning">
+Ne prends pas l'habitude d'utiliser `kill -9` en premier réflexe. Toujours commencer par `kill PID` (SIGTERM) et attendre quelques secondes. SIGKILL ne laisse pas le process fermer ses fichiers, libérer ses verrous ou terminer ses transactions en base de données. Ça peut corrompre des données.
+</Callout>
+
+</Layer>
+
+<Layer id="ressources" order={7} title="Ressources" subtitle="CPU, RAM, I/O consommés" icon="Gauge">
+
+## Ce que chaque process coûte à ta machine
+
+Chaque process qui tourne consomme des ressources. Le CPU est le temps de calcul : un process qui fait des calculs lourds (compression vidéo, machine learning) monopolise un ou plusieurs coeurs du processeur. La RAM est la mémoire vive : chaque process a son espace mémoire, et si tous les processes demandent plus de RAM qu'il n'y en a, le système commence à utiliser le swap (le disque comme mémoire de secours) et tout ralentit drastiquement.
+
+L'I/O (Input/Output) est souvent le goulot d'étranglement oublié. Un process qui lit ou écrit beaucoup sur le disque (une base de données, un traitement de fichiers) peut ralentir toute la machine, même si le CPU et la RAM sont sous-utilisés. Les disques, même les SSD, sont infiniment plus lents que la RAM.
+
+Linux permet de limiter les ressources d'un process avec les cgroups (control groups). Tu peux dire : "ce process n'a le droit d'utiliser que 50% du CPU et 512 Mo de RAM max". C'est exactement ce que Docker utilise pour isoler les conteneurs. Sans cgroups, un seul process gourmand pourrait paralyser toute la machine.
+
+<Analogy>
+Les ressources d'un process, c'est comme le budget d'un département dans une entreprise. Le CPU, c'est le temps des employés. La RAM, c'est l'espace de bureau. L'I/O, c'est la bande passante de l'imprimante. Si un département monopolise toutes les imprimantes, les autres départements sont bloqués même s'ils ont plein d'employés et d'espace. Les cgroups, c'est le directeur financier qui impose des quotas à chaque département.
+</Analogy>
+
+<KeyConcept term="cgroups (Control Groups)">
+Un mécanisme du kernel Linux qui permet de limiter, mesurer et isoler les ressources (CPU, RAM, I/O disque, réseau) utilisées par un groupe de processes. C'est la technologie fondamentale derrière Docker et les conteneurs : chaque conteneur est un cgroup qui empêche les processes à l'intérieur de consommer plus que leur quota.
+</KeyConcept>
+
+<Example brand="Spotify">
+Les serveurs de Spotify font tourner des centaines de micro-services, chacun dans son propre conteneur Docker avec des limites de ressources strictes. Le service de recommandation musicale (qui utilise du machine learning) a droit à plus de CPU. Le service qui gère les playlists a droit à plus de RAM pour son cache. Le service de streaming a une priorité I/O élevée pour lire les fichiers audio rapidement. Les cgroups garantissent qu'aucun service ne peut voler les ressources des autres.
+</Example>
+
+</Layer>
+
+<Layer id="outils-monitoring" order={8} title="Outils de monitoring" subtitle="top, htop, ps, systemctl" icon="Monitor">
+
+## Les yeux pour voir ce qui se passe
+
+Sans monitoring, tu pilotes à l'aveugle. Les outils de monitoring te permettent de voir en temps réel quels processes tournent, combien de ressources ils consomment, et lesquels posent problème. C'est le tableau de bord de ta machine.
+
+`ps aux` te donne un snapshot instantané de tous les processes. `top` affiche un dashboard temps réel avec les processes triés par consommation CPU. `htop` est la version améliorée de top avec des couleurs, des barres de progression et la possibilité de tuer un process directement depuis l'interface. `systemctl status nom-du-service` montre l'état d'un service spécifique (actif, inactif, en erreur).
+
+Pour un monitoring plus avancé, il existe des outils comme `iotop` (I/O disque par process), `nethogs` (réseau par process), `strace` (tracer les appels système d'un process) et `lsof` (lister les fichiers ouverts par un process). Sur un VPS en production, tu utiliseras des outils comme Prometheus + Grafana pour collecter et visualiser les métriques sur la durée.
+
+<Analogy>
+Les outils de monitoring, c'est comme le tableau de bord d'une voiture. La jauge d'essence (RAM), le compteur de tours (CPU), le voyant de température (I/O), l'indicateur de vitesse (réseau). Tu peux conduire sans regarder le tableau de bord, mais tu risques de tomber en panne sèche ou de griller le moteur sans t'en rendre compte. Le monitoring, c'est la différence entre un conducteur amateur et un pilote professionnel.
+</Analogy>
+
+<KeyConcept term="htop">
+Un outil interactif de monitoring des processes pour Linux, version améliorée de top. Il affiche en temps réel la liste de tous les processes avec leur PID, utilisateur, consommation CPU/RAM, état, et commande. Il permet de trier, filtrer, rechercher et tuer des processes directement depuis son interface. C'est souvent le premier outil qu'on installe sur un nouveau serveur.
+</KeyConcept>
+
+<Example brand="Datadog">
+Datadog est une plateforme de monitoring utilisée par des entreprises comme Airbnb, Samsung et Twitch. Leur agent s'installe sur chaque serveur et collecte les métriques de tous les processes : CPU, RAM, I/O, réseau, nombre de processes, processes zombies. Toutes ces données sont centralisées dans un dashboard avec des alertes automatiques. Si le process PostgreSQL consomme soudainement 95% de la RAM, Datadog envoie une alerte Slack avant que le serveur ne plante.
+</Example>
+
+<Callout type="tip">
+Installe htop sur chaque serveur avec `apt install htop`. C'est le premier réflexe quand un serveur est lent : lance htop et regarde quel process mange tout le CPU ou la RAM. En deux secondes, tu sais d'où vient le problème. Appuie sur F6 pour trier par CPU, MEM ou TIME.
+</Callout>
+
+</Layer>
+
+</LayerStack>

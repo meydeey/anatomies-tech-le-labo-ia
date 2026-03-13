@@ -1,0 +1,211 @@
+<LayerStack>
+
+<Layer id="hardware-docker" order={1} title="Hardware du serveur" subtitle="La machine physique" icon="Server">
+
+## La fondation physique
+
+Avant de parler de conteneurs et d'images, il faut comprendre que Docker tourne sur une vraie machine. Un serveur physique avec un processeur, de la RAM, des disques durs et une connexion réseau. Sans cette base materielle, rien ne fonctionne.
+
+Quand tu deploies un conteneur Docker sur un cloud comme AWS ou DigitalOcean, ton conteneur finit toujours par s'executer sur du vrai hardware quelque part dans un datacenter. Le fait que tu ne vois pas cette machine ne veut pas dire qu'elle n'existe pas.
+
+La puissance de ta machine physique determine combien de conteneurs tu peux faire tourner en meme temps. Un petit serveur avec 1 CPU et 1 Go de RAM pourra gerer quelques conteneurs legers, alors qu'un serveur costaud avec 32 CPUs et 128 Go de RAM pourra en heberger des dizaines.
+
+<Analogy>
+Le hardware, c'est le terrain sur lequel tu construis. Tu peux avoir les meilleurs plans d'architecte (Docker), si ton terrain fait 10m2, tu ne construiras pas un immeuble de 20 etages. Plus le terrain est grand et solide, plus tu peux construire dessus.
+</Analogy>
+
+<KeyConcept term="Serveur physique (Bare Metal)">
+Une machine reelle dans un datacenter, avec ses propres composants (CPU, RAM, disque, reseau). C'est la couche la plus basse sur laquelle tout le reste repose. On l'appelle parfois "bare metal" pour bien distinguer du virtuel.
+</KeyConcept>
+
+<Example brand="AWS">
+Quand tu lances un service sur AWS ECS (Elastic Container Service), tes conteneurs Docker tournent sur des instances EC2 qui sont elles-memes des portions de serveurs physiques dans les datacenters d'Amazon. Ces machines sont reparties dans des regions du monde entier (Paris, Francfort, Virginie...).
+</Example>
+
+</Layer>
+
+<Layer id="os-hote" order={2} title="Systeme d'exploitation hote" subtitle="Linux sur la machine" icon="Monitor">
+
+## Le chef d'orchestre de la machine
+
+Le systeme d'exploitation hote, c'est le premier logiciel qui tourne sur le hardware. Dans 99% des cas avec Docker, c'est Linux (Ubuntu, Debian, CentOS...). Meme quand tu utilises Docker Desktop sur Mac ou Windows, il y a une machine virtuelle Linux cachee en dessous.
+
+Le role de l'OS hote est crucial : c'est lui qui gere le processeur, la memoire, les disques et le reseau. Docker s'appuie directement sur le kernel (noyau) Linux pour creer l'isolation des conteneurs. Contrairement aux machines virtuelles qui ont besoin d'un OS complet chacune, les conteneurs Docker partagent le meme kernel.
+
+C'est pour cette raison que Docker est si leger et rapide. Pas besoin de demarrer un OS complet pour chaque conteneur. Le kernel de l'hote fait le travail pour tout le monde.
+
+<Analogy>
+L'OS hote, c'est comme le systeme electrique et la plomberie d'un immeuble. Chaque appartement (conteneur) n'a pas besoin de sa propre centrale electrique. Ils partagent tous la meme infrastructure de base, ce qui rend la construction bien plus rapide et economique.
+</Analogy>
+
+<KeyConcept term="Kernel (noyau)">
+Le coeur du systeme d'exploitation qui communique directement avec le hardware. Docker utilise des fonctionnalites specifiques du kernel Linux comme les namespaces (isolation) et les cgroups (limitation de ressources) pour creer des conteneurs. C'est ce qui rend Docker fondamentalement different d'une machine virtuelle.
+</KeyConcept>
+
+<Example brand="Docker Desktop">
+Quand tu installes Docker Desktop sur ton Mac, il cree en fait une mini machine virtuelle Linux invisible en arriere-plan. C'est pour ca que Docker Desktop consomme de la RAM meme quand aucun conteneur ne tourne. Cette VM Linux fournit le kernel dont Docker a besoin pour fonctionner.
+</Example>
+
+</Layer>
+
+<Layer id="docker-engine" order={3} title="Docker Engine" subtitle="Le moteur qui gere les conteneurs" icon="Cog">
+
+## Le cerveau de Docker
+
+Docker Engine, c'est le logiciel central qui fait tout le travail. C'est un service (daemon) qui tourne en permanence sur ta machine et qui attend tes instructions. Quand tu tapes `docker run`, `docker build` ou `docker ps`, c'est Docker Engine qui recoit et execute ces commandes.
+
+Il se compose de trois parties : le daemon `dockerd` (le service en arriere-plan), l'API REST (l'interface de communication), et le CLI `docker` (les commandes que tu tapes dans le terminal). Le CLI parle a l'API, qui parle au daemon, qui fait le travail.
+
+Docker Engine gere tout le cycle de vie des conteneurs : les creer, les demarrer, les arreter, les supprimer. Il gere aussi le telechargement des images, le reseau entre conteneurs, et le stockage des donnees.
+
+<Analogy>
+Docker Engine, c'est le directeur d'un hotel. Tu arrives a la reception (CLI), tu fais ta demande, le receptionniste la transmet au directeur (daemon) via le systeme interne (API), et le directeur s'occupe de tout : preparer ta chambre, gerer le menage, la clim, le wifi. Tu ne vois rien de tout ca, tu as juste ta chambre prete.
+</Analogy>
+
+<KeyConcept term="Docker Engine">
+Le service central de Docker qui tourne en arriere-plan (daemon). Il recoit les commandes via son API, gere les images, cree et supervise les conteneurs, et orchestre les reseaux et volumes. C'est l'intermediaire entre toi et le kernel Linux.
+</KeyConcept>
+
+<Example brand="Coolify">
+Coolify, l'alternative open-source a Vercel/Heroku, utilise Docker Engine en coulisses. Quand tu deploies une app via Coolify, il genere automatiquement les commandes Docker necessaires. Docker Engine se charge ensuite de builder l'image, lancer le conteneur, et configurer le reseau. Tu ne vois qu'un bouton "Deploy", mais derriere c'est Docker Engine qui fait tout.
+</Example>
+
+<Callout type="info">
+Tu n'as jamais besoin d'interagir directement avec le daemon Docker. Le CLI et les outils comme Docker Desktop, Portainer ou Coolify servent justement d'interface simplifiee.
+</Callout>
+
+</Layer>
+
+<Layer id="image-docker" order={4} title="Image Docker" subtitle="Le moule/la recette (Dockerfile)" icon="FileCode">
+
+## La recette complete de ton application
+
+Une image Docker, c'est un package qui contient absolument tout ce dont ton application a besoin pour tourner : le code, les dependances, les librairies systeme, la configuration, et meme un mini systeme de fichiers. C'est un snapshot fige, immuable, pret a etre execute.
+
+On cree une image a partir d'un fichier appele `Dockerfile`. Ce fichier est une suite d'instructions qui decrivent etape par etape comment construire l'image. Par exemple : "pars de Node.js 20, copie mes fichiers, installe les dependances, lance le serveur". Chaque instruction cree une "couche" (layer) et Docker met ces couches en cache pour accelerer les builds suivants.
+
+Les images sont stockees dans des registres (registries). Docker Hub est le registre public le plus connu, mais tu peux aussi utiliser GitHub Container Registry ou un registre prive. Quand tu fais `docker pull`, tu telecharges une image depuis un registre.
+
+<Analogy>
+L'image Docker, c'est une recette de cuisine complete avec tous les ingredients deja peses et emballes dans un kit. N'importe qui peut prendre ce kit, suivre les etapes, et obtenir exactement le meme plat. Peu importe sa cuisine (son serveur), le resultat sera identique.
+</Analogy>
+
+<KeyConcept term="Dockerfile">
+Un fichier texte qui contient les instructions pour construire une image Docker. Chaque ligne (FROM, COPY, RUN, CMD...) ajoute une couche a l'image. C'est la "recette" que Docker Engine suit pour creer ton image reproductible.
+</KeyConcept>
+
+<Example brand="n8n">
+L'image officielle de n8n (`n8nio/n8n`) sur Docker Hub contient Node.js, le code de n8n, et toutes ses dependances. Quand tu fais `docker pull n8nio/n8n`, tu recuperes ce package complet. Que tu le lances sur ton Mac, un VPS OVH ou un serveur AWS, tu obtiendras exactement la meme instance de n8n.
+</Example>
+
+<Callout type="tip">
+Toujours utiliser des tags de version specifiques dans tes Dockerfiles (ex: `node:20-alpine` au lieu de `node:latest`). Avec `latest`, ton image peut changer sans prevenir et casser ton deploiement.
+</Callout>
+
+</Layer>
+
+<Layer id="conteneur" order={5} title="Conteneur" subtitle="L'instance qui tourne" icon="Box">
+
+## La recette en train de cuire
+
+Si l'image est la recette, le conteneur est le plat en train de cuire. C'est une instance vivante, en cours d'execution, creee a partir d'une image. Tu peux lancer plusieurs conteneurs a partir de la meme image, comme tu peux preparer plusieurs plats avec la meme recette.
+
+Un conteneur est isole du reste de la machine. Il a son propre systeme de fichiers, ses propres processus, son propre reseau. Il ne voit pas les autres conteneurs ni le systeme hote (sauf si tu le configures explicitement). Cette isolation est la vraie force de Docker.
+
+Le conteneur est ephemere par nature. Quand tu l'arretes et le supprimes, tout ce qui etait a l'interieur disparait (sauf si tu as configure des volumes). C'est voulu : ca force a construire des applications reproductibles et a separer les donnees du code.
+
+<Analogy>
+Un conteneur, c'est un food truck. Il est autonome, il contient tout ce qu'il faut pour fonctionner (cuisine, ingredients, ustensiles), il est isole des autres food trucks, et tu peux en deplacer un ou en ajouter un autre identique en quelques minutes. Si un food truck tombe en panne, les autres continuent de servir.
+</Analogy>
+
+<KeyConcept term="Conteneur">
+Une instance en cours d'execution d'une image Docker. C'est un processus isole qui a son propre espace de fichiers, reseau et memoire. Il est leger (quelques Mo), demarre en secondes, et peut etre cree, arrete et supprime a volonte.
+</KeyConcept>
+
+<Example brand="Supabase">
+Quand tu lances Supabase en local avec `supabase start`, ca demarre en fait une dizaine de conteneurs Docker : un pour PostgreSQL, un pour l'API REST (PostgREST), un pour l'authentification (GoTrue), un pour le stockage, un pour le dashboard... Chaque service est isole dans son propre conteneur, mais ils communiquent entre eux via un reseau Docker interne.
+</Example>
+
+</Layer>
+
+<Layer id="volumes-reseaux" order={6} title="Volumes & Reseaux" subtitle="Persistance des donnees et communication" icon="HardDrive">
+
+## Garder les donnees et connecter les conteneurs
+
+Par defaut, un conteneur est amnesique : quand il s'arrete, il oublie tout. Les volumes Docker resolvent ce probleme en creant des espaces de stockage persistants. Un volume, c'est un dossier sur la machine hote qui est "monte" dans le conteneur. Les donnees ecrites dans ce dossier survivent meme si le conteneur est supprime.
+
+Pour le reseau, Docker cree par defaut un reseau virtuel pour chaque projet. Les conteneurs sur le meme reseau peuvent se parler en utilisant leur nom comme adresse (ex: le conteneur "app" peut appeler "db" directement). C'est comme un reseau local prive entre tes conteneurs.
+
+Tu peux aussi exposer des ports pour rendre un conteneur accessible depuis l'exterieur. Par exemple, mapper le port 3000 du conteneur sur le port 80 de la machine hote, pour qu'un visiteur accede a ton app via le port standard HTTP.
+
+<Analogy>
+Les volumes, c'est comme un coffre-fort dans un hotel. Meme si tu changes de chambre (conteneur) ou si tu quittes l'hotel et reviens, tes affaires sont toujours la dans le coffre. Le reseau Docker, c'est l'interphone interne de l'hotel : les chambres peuvent communiquer entre elles sans passer par l'exterieur.
+</Analogy>
+
+<KeyConcept term="Volume Docker">
+Un espace de stockage gere par Docker qui persiste independamment du cycle de vie des conteneurs. Les donnees dans un volume survivent a la suppression d'un conteneur. Indispensable pour les bases de donnees, fichiers uploades, ou toute donnee que tu ne veux pas perdre.
+</KeyConcept>
+
+<Example brand="Portainer">
+Quand tu installes Portainer (l'interface graphique pour gerer Docker), tu crees un volume pour stocker sa configuration : `docker volume create portainer_data`. Meme si tu mets a jour Portainer en supprimant et recreant le conteneur, tous tes reglages, utilisateurs et stacks sont preserves grace a ce volume.
+</Example>
+
+<Callout type="warning">
+Ne jamais lancer une base de donnees (PostgreSQL, MySQL, Redis) sans volume. Sans volume, toutes les donnees sont perdues au redemarrage du conteneur. C'est l'erreur la plus frequente chez les debutants Docker.
+</Callout>
+
+</Layer>
+
+<Layer id="docker-compose" order={7} title="Docker Compose" subtitle="Orchestrer plusieurs conteneurs ensemble" icon="GitMerge">
+
+## Diriger tout l'orchestre
+
+Docker Compose est l'outil qui te permet de definir et lancer plusieurs conteneurs en meme temps avec un seul fichier `docker-compose.yml`. Au lieu de taper 15 commandes `docker run` avec des options a rallonge, tu decris toute ton architecture dans un fichier lisible.
+
+Dans ce fichier YAML, tu definis tes "services" (chaque service = un conteneur), les reseaux, les volumes, les variables d'environnement, et les dependances entre services. Un `docker compose up` et tout demarre dans le bon ordre. Un `docker compose down` et tout s'arrete proprement.
+
+C'est l'outil indispensable des que ton projet a plus d'un conteneur, c'est-a-dire la quasi-totalite des projets reels. Une app web typique a au minimum : l'application + une base de donnees + parfois un reverse proxy.
+
+<Analogy>
+Docker Compose, c'est la partition du chef d'orchestre. Chaque musicien (conteneur) sait jouer son instrument seul, mais c'est la partition qui indique qui joue quand, a quel volume, et comment les instruments s'harmonisent ensemble. Sans chef d'orchestre, c'est la cacophonie.
+</Analogy>
+
+<KeyConcept term="Docker Compose">
+Un outil qui lit un fichier `docker-compose.yml` pour creer et gerer une stack multi-conteneurs. Il gere automatiquement les reseaux, volumes, ordres de demarrage et variables d'environnement. C'est le standard de facto pour les environnements de developpement et les petits deploiements.
+</KeyConcept>
+
+<Example brand="n8n">
+Le docker-compose typique de n8n inclut : le conteneur n8n lui-meme, un conteneur PostgreSQL pour stocker les workflows, et parfois un conteneur Traefik comme reverse proxy pour le HTTPS. En 30 lignes de YAML et un `docker compose up -d`, tu as une instance n8n complete, securisee, avec des donnees persistantes.
+</Example>
+
+<Callout type="tip">
+Utilise toujours `docker compose up -d` (avec le flag `-d` pour "detached") en production. Sans le `-d`, tes conteneurs s'arretent des que tu fermes le terminal.
+</Callout>
+
+</Layer>
+
+<Layer id="app-deployee" order={8} title="Application deployee" subtitle="Le service accessible" icon="Rocket">
+
+## Le resultat final
+
+Apres toutes ces couches, voila le resultat : ton application tourne, isolee, reproductible, accessible au monde entier. L'utilisateur final tape une URL dans son navigateur et accede a ton service. Il ne sait rien de Docker, des conteneurs ou des volumes. Il voit juste un site ou une app qui fonctionne.
+
+L'avantage majeur de tout ce stack Docker, c'est la reproductibilite. "Ca marche sur ma machine" n'est plus une excuse. Si ca marche dans un conteneur en local, ca marchera exactement pareil en production. Le deploiement devient un simple `docker compose pull && docker compose up -d`.
+
+La mise a jour aussi est simplifiee : tu builds une nouvelle image, tu push sur ton registre, et tu relances le conteneur. Zero downtime si tu utilises un reverse proxy intelligent. Et si la nouvelle version a un bug, tu reviens a l'image precedente en une commande.
+
+<Analogy>
+C'est comme un restaurant franchise. Chaque franchise (serveur) recoit exactement le meme kit (image Docker) avec les memes recettes, les memes ingredients, les memes equipements. Le client qui va chez McDonald's a Paris ou a Tokyo obtient le meme Big Mac. Docker fait pareil avec tes applications.
+</Analogy>
+
+<KeyConcept term="Deploiement conteneurise">
+Le fait de livrer et executer une application sous forme de conteneur Docker. Cela garantit que l'app fonctionne de maniere identique partout (dev, staging, production), elimine les problemes de dependances, et simplifie les mises a jour et rollbacks.
+</KeyConcept>
+
+<Example brand="Vercel">
+Vercel utilise des conteneurs en interne pour builder et servir chaque deploiement Next.js. Quand tu fais `git push`, Vercel cree une image de build, lance un conteneur pour compiler ton app, puis deploie le resultat sur son edge network. Tout est contenerise, meme si tu ne le vois jamais.
+</Example>
+
+</Layer>
+
+</LayerStack>

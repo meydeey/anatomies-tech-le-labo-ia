@@ -1,0 +1,213 @@
+<LayerStack>
+
+<Layer id="disque-stockage" order={1} title="Disque dur / Stockage" subtitle="Où les données sont physiquement écrites" icon="HardDrive">
+
+## Tout commence par du métal et du silicium
+
+Tes données ne flottent pas dans le cloud -- elles sont écrites physiquement quelque part. Sur un disque dur (HDD) avec des plateaux magnétiques qui tournent, ou sur un SSD avec des puces de mémoire flash. Quand tu fais un `INSERT INTO` sur Supabase, ces données finissent sur un disque dans un datacenter AWS (Supabase tourne sur AWS).
+
+La performance d'une base de données dépend énormément du stockage. Un SSD NVMe est environ 100 fois plus rapide qu'un HDD pour les lectures aléatoires -- exactement le type d'opérations qu'une base de données fait en permanence. C'est pourquoi les bases de données de production utilisent quasiment toujours des SSD.
+
+Le stockage introduit aussi la notion de **persistance**. Contrairement à la RAM (mémoire vive) qui s'efface quand le serveur redémarre, le disque conserve les données de manière permanente. Ta base de données écrit d'abord en mémoire pour la vitesse, puis "flush" sur le disque pour la durabilité. C'est un compromis constant entre vitesse et sécurité des données.
+
+<Analogy>
+Le disque dur, c'est l'entrepôt physique d'une bibliothèque. Les livres (données) ne flottent pas en l'air -- ils sont posés sur des étagères (secteurs du disque). Plus l'entrepôt est grand, plus tu peux stocker de livres. Plus les allées sont larges et bien organisées (SSD vs HDD), plus le bibliothécaire peut retrouver un livre rapidement.
+</Analogy>
+
+<KeyConcept term="Persistance (Durability)">
+La persistance garantit qu'une donnée écrite ne disparaît pas après un crash ou un redémarrage. PostgreSQL utilise un mécanisme appelé WAL (Write-Ahead Log) : avant chaque modification, il écrit l'opération dans un journal séquentiel sur le disque. Même si le serveur plante au milieu d'une écriture, les données peuvent être reconstituées à partir du WAL au redémarrage.
+</KeyConcept>
+
+<Example brand="Supabase">
+Quand tu crées un projet Supabase, tu choisis une région (ex: eu-west-1 pour l'Europe). Derrière, Supabase provisionne une instance PostgreSQL sur AWS avec du stockage SSD (EBS gp3). Les données sont répliquées sur plusieurs disques dans le datacenter pour la redondance. Le plan Pro offre des backups automatiques quotidiens -- tes données survivent même si un disque tombe en panne.
+</Example>
+
+</Layer>
+
+<Layer id="moteur-stockage" order={2} title="Moteur de stockage" subtitle="Comment les données sont organisées sur le disque" icon="Cog">
+
+## L'architecte invisible qui range tes données
+
+Entre le disque brut et tes belles tables SQL, il y a le moteur de stockage. C'est lui qui décide **comment** organiser physiquement les données sur le disque. Est-ce qu'on empile les lignes les unes après les autres ? Est-ce qu'on les range par colonne ? Est-ce qu'on utilise des arbres, des hash maps ?
+
+PostgreSQL (la base derrière Supabase) utilise un système appelé **MVCC** (Multi-Version Concurrency Control) avec un stockage "heap". Concrètement, chaque modification crée une nouvelle version de la ligne plutôt que d'écraser l'ancienne. Ça permet à plusieurs utilisateurs de lire et écrire en même temps sans se bloquer.
+
+Le moteur gère aussi les **pages** -- des blocs de 8 Ko dans PostgreSQL. Les données ne sont pas lues octet par octet mais page par page. Quand tu lis une seule ligne, PostgreSQL charge en mémoire toute la page de 8 Ko qui la contient. C'est plus efficace parce que les données voisines sont souvent demandées ensemble (principe de localité).
+
+<Analogy>
+Le moteur de stockage, c'est le système de rangement d'un entrepôt IKEA. Les produits ne sont pas jetés en vrac -- ils sont rangés dans des allées numérotées, sur des étagères spécifiques, avec un système de coordonnées (allée 14, étagère 3, position 7). Le système de rangement détermine à quelle vitesse un employé peut trouver un produit spécifique.
+</Analogy>
+
+<KeyConcept term="MVCC (Multi-Version Concurrency Control)">
+MVCC est une technique où chaque transaction voit un "snapshot" cohérent de la base au moment où elle commence. Au lieu de verrouiller les lignes pendant les modifications, PostgreSQL crée de nouvelles versions. Un lecteur voit l'ancienne version pendant qu'un écrivain crée la nouvelle. Résultat : les lectures ne bloquent jamais les écritures, et vice versa. C'est ce qui permet à des centaines d'utilisateurs d'interagir simultanément avec la base.
+</KeyConcept>
+
+<Example brand="PostgreSQL">
+PostgreSQL utilise un processus appelé VACUUM pour nettoyer les anciennes versions de lignes créées par MVCC. Sans VACUUM, la base grossit indéfiniment. Supabase configure automatiquement l'autovacuum pour toi, mais sur les tables très actives (millions de modifications par jour), tu peux avoir besoin d'ajuster les paramètres. C'est un des rares cas où il faut "maintenir" une base PostgreSQL.
+</Example>
+
+</Layer>
+
+<Layer id="schema-tables" order={3} title="Schéma & Tables" subtitle="La structure (colonnes, types, relations)" icon="Table">
+
+## Le plan de l'entrepôt
+
+Le schéma, c'est le **plan architectural** de ta base. Il définit quelles tables existent, quelles colonnes chaque table contient, quel type de donnée chaque colonne accepte, et comment les tables sont reliées entre elles. C'est comme un contrat : "la colonne email est de type TEXT et ne peut pas être vide".
+
+Une table, c'est un tableau avec des colonnes (les champs) et des lignes (les enregistrements). La table `users` a des colonnes `id`, `email`, `name`, `created_at`. Chaque ligne est un utilisateur. Les **relations** connectent les tables : un utilisateur peut avoir plusieurs commandes, donc la table `orders` a une colonne `user_id` qui pointe vers `users.id`.
+
+Les types de données sont importants : `TEXT` pour du texte, `INTEGER` pour des nombres entiers, `BOOLEAN` pour vrai/faux, `TIMESTAMPTZ` pour des dates avec fuseau horaire, `UUID` pour des identifiants uniques, `JSONB` pour du JSON flexible. Choisir le bon type, c'est garantir l'intégrité de tes données -- impossible de stocker "abc" dans une colonne INTEGER.
+
+<Analogy>
+Le schéma, c'est le plan d'un classeur de bureau. Tu définis les dossiers (tables), les onglets dans chaque dossier (colonnes), et le type de document accepté dans chaque onglet (types). Le dossier "Clients" a un onglet "Nom" (texte), "Date de naissance" (date), "Numéro client" (nombre). Si quelqu'un essaie de ranger un dessin dans l'onglet "Numéro client", le classeur refuse.
+</Analogy>
+
+<KeyConcept term="Clé étrangère (Foreign Key)">
+Une clé étrangère est une colonne qui fait référence à la clé primaire d'une autre table. Dans `orders.user_id → users.id`, la colonne `user_id` est une clé étrangère. PostgreSQL garantit que tu ne peux pas créer une commande pour un utilisateur qui n'existe pas (intégrité référentielle). Si tu essaies de supprimer un utilisateur qui a des commandes, PostgreSQL te bloquera (sauf si tu configures un `ON DELETE CASCADE`).
+</KeyConcept>
+
+<Example brand="Supabase">
+Dans le Supabase Dashboard, le Table Editor te permet de créer des tables visuellement : tu ajoutes des colonnes, choisis les types, et définis les relations en quelques clics. Mais tu peux aussi utiliser l'éditeur SQL pour plus de contrôle. Supabase crée automatiquement un schéma `public` (tes tables) et un schéma `auth` (les tables d'authentification gérées par Supabase). Tu ne touches jamais au schéma `auth` directement.
+</Example>
+
+</Layer>
+
+<Layer id="index" order={4} title="Index" subtitle="Les raccourcis pour chercher vite" icon="Search">
+
+## La table des matières de ta base
+
+Sans index, pour trouver un utilisateur par email dans une table de 1 million de lignes, PostgreSQL doit lire **chaque ligne** une par une (sequential scan). Avec un index sur la colonne `email`, il saute directement à la bonne ligne. La différence : quelques millisecondes au lieu de plusieurs secondes.
+
+Un index, c'est une structure de données séparée (un B-tree par défaut dans PostgreSQL) qui maintient une copie triée des valeurs d'une colonne avec des pointeurs vers les lignes complètes. C'est exactement comme l'index à la fin d'un livre : au lieu de feuilleter 500 pages pour trouver "PostgreSQL", tu regardes l'index qui te dit "page 234".
+
+Mais les index ne sont pas gratuits. Chaque index occupe de l'espace disque et ralentit les **écritures** (INSERT, UPDATE, DELETE), parce que l'index doit être mis à jour à chaque modification. La règle : indexe les colonnes que tu cherches souvent (WHERE, JOIN, ORDER BY), mais n'indexe pas tout. Sur une table de logs où tu écris beaucoup mais lis rarement, trop d'index est contre-productif.
+
+<Analogy>
+Un index, c'est l'annuaire téléphonique. Sans annuaire, pour trouver le numéro de Jean Dupont, tu devrais appeler chaque habitant de la ville un par un : "Bonjour, êtes-vous Jean Dupont ?". Avec l'annuaire (trié par nom), tu ouvres directement à la lettre D et tu trouves en quelques secondes. Mais maintenir cet annuaire prend du temps -- chaque nouveau habitant doit y être ajouté au bon endroit.
+</Analogy>
+
+<KeyConcept term="B-tree Index">
+Le B-tree (arbre équilibré) est le type d'index par défaut dans PostgreSQL. Il organise les données dans une structure arborescente où chaque noeud contient plusieurs clés triées. Pour trouver une valeur parmi 1 million de lignes, il suffit de traverser 3-4 niveaux de l'arbre (complexité logarithmique). PostgreSQL supporte aussi d'autres types : GIN (pour le full-text search et JSONB), GiST (pour les données géographiques), et BRIN (pour les données naturellement triées).
+</KeyConcept>
+
+<Example brand="Supabase">
+Supabase crée automatiquement un index sur la clé primaire (`id`) de chaque table. Mais si tu filtres souvent par `email` ou `status`, tu dois créer ces index toi-même : `CREATE INDEX idx_users_email ON users(email)`. Dans le Dashboard Supabase, tu peux voir les index existants et en créer de nouveaux. Un signe que tu as besoin d'un index : une requête qui prend plus de 100ms sur une table de quelques milliers de lignes.
+</Example>
+
+<Callout type="tip">
+Utilise `EXPLAIN ANALYZE` devant tes requêtes SQL pour voir comment PostgreSQL les exécute. Si tu vois "Seq Scan" (scan séquentiel) sur une grosse table, c'est probablement qu'il manque un index. L'onglet "SQL Editor" de Supabase supporte directement EXPLAIN ANALYZE.
+</Callout>
+
+</Layer>
+
+<Layer id="langage-sql" order={5} title="Langage SQL" subtitle="Le langage pour parler à la base" icon="Code">
+
+## Le langage universel des bases de données
+
+SQL (Structured Query Language) est le langage que tu utilises pour parler à ta base de données. C'est un langage **déclaratif** : tu dis **ce que tu veux**, pas **comment l'obtenir**. Tu écris `SELECT * FROM users WHERE age > 18` et c'est le moteur de la base qui décide comment exécuter la requête de la façon la plus efficace.
+
+Les opérations fondamentales se résument en 4 lettres : **CRUD**. `SELECT` pour lire (Read), `INSERT` pour créer (Create), `UPDATE` pour modifier (Update), `DELETE` pour supprimer (Delete). Avec ces 4 commandes et les clauses `WHERE`, `JOIN`, `GROUP BY`, `ORDER BY`, tu peux faire 90% de ce dont tu as besoin.
+
+SQL est aussi le langage des **transactions**. Une transaction regroupe plusieurs opérations qui doivent réussir ou échouer ensemble. Transférer de l'argent entre deux comptes, c'est deux opérations (débiter un compte, créditer l'autre) qui ne doivent jamais être exécutées partiellement. `BEGIN`, `COMMIT`, `ROLLBACK` sont les commandes clés.
+
+<Analogy>
+SQL, c'est comme commander dans un restaurant. Tu dis au serveur "Je veux tous les plats végétariens à moins de 15 euros, triés par prix" (SELECT). Tu ne lui expliques pas comment aller en cuisine, ouvrir le frigo et préparer le plat -- tu décris juste ce que tu veux, et le restaurant (la base) se débrouille pour te le livrer de la façon la plus efficace possible.
+</Analogy>
+
+<KeyConcept term="Transaction ACID">
+ACID est un ensemble de propriétés qui garantissent la fiabilité des transactions. Atomicité : tout réussit ou tout échoue (pas de demi-transfert bancaire). Cohérence : la base passe d'un état valide à un autre état valide. Isolation : les transactions concurrentes ne se voient pas mutuellement. Durabilité : une fois validée (COMMIT), la donnée survit à un crash. PostgreSQL respecte ACID à 100%, contrairement à certaines bases NoSQL.
+</KeyConcept>
+
+<Example brand="Supabase">
+Supabase te donne un éditeur SQL directement dans le Dashboard. Tu peux y écrire et exécuter du SQL pur sur ta base PostgreSQL. Mais la plupart du temps, tu utilises le Supabase JS client qui traduit en SQL pour toi : `supabase.from('users').select('*').eq('age', 18)` génère un `SELECT * FROM users WHERE age = 18`. C'est plus lisible en JavaScript, mais c'est du SQL sous le capot.
+</Example>
+
+</Layer>
+
+<Layer id="connexion-auth" order={6} title="Connexion & Auth" subtitle="Qui a le droit de lire/écrire" icon="Lock">
+
+## Le videur de ta base de données
+
+Une base de données sans contrôle d'accès, c'est comme un coffre-fort ouvert. N'importe qui pourrait lire les données sensibles, modifier les prix, ou supprimer des tables entières. La couche connexion et auth définit **qui** peut se connecter et **ce qu'il** peut faire.
+
+PostgreSQL gère les accès avec des **rôles** (users et groups). Chaque rôle a des **privileges** : le droit de SELECT, INSERT, UPDATE, DELETE sur des tables spécifiques. Le superuser peut tout faire. Le rôle `anon` de Supabase a des droits très limités (ce que les visiteurs non connectés peuvent voir). Le rôle `authenticated` a plus de droits (ce que les utilisateurs connectés peuvent voir).
+
+Au-dessus des rôles, Supabase utilise les **Row Level Security (RLS)** policies de PostgreSQL. Les RLS vont plus loin que les privileges : elles filtrent les données **ligne par ligne**. Tu peux dire "un utilisateur ne peut voir que SES propres lignes" -- impossible à contourner, même en accédant directement à la base.
+
+<Analogy>
+La connexion et l'auth, c'est le système de badges dans un immeuble de bureaux. L'accueil te donne un badge (connexion). Ce badge ouvre certaines portes mais pas d'autres (privileges). Le 3e étage est accessible à l'équipe marketing, le 5e à la direction. Et au sein de chaque bureau, tu n'as accès qu'à tes propres dossiers (RLS). Même le concierge qui a les clés de toutes les portes ne peut pas lire tes dossiers personnels.
+</Analogy>
+
+<KeyConcept term="Row Level Security (RLS)">
+Les RLS sont des politiques de sécurité au niveau des lignes dans PostgreSQL. Elles ajoutent automatiquement des conditions WHERE à chaque requête. Par exemple, `USING (auth.uid() = user_id)` fait que `SELECT * FROM posts` renvoie uniquement les posts de l'utilisateur connecté, même si la requête ne filtre pas explicitement. C'est une sécurité au niveau le plus bas -- impossible à contourner par l'API.
+</KeyConcept>
+
+<Example brand="Supabase">
+Par défaut, Supabase active RLS sur toutes les nouvelles tables. Si tu crées une table sans ajouter de policy, PERSONNE ne peut y accéder (deny by default). Tu dois explicitement créer des policies : `CREATE POLICY "Users can read own data" ON profiles FOR SELECT USING (auth.uid() = id)`. C'est contraignant au début, mais ça te force à réfléchir à la sécurité dès le départ.
+</Example>
+
+<Callout type="warning">
+Si tu désactives RLS sur une table Supabase pour "que ça marche vite", n'oublie JAMAIS de la réactiver. Sans RLS, n'importe qui avec ta clé `anon` publique (visible dans le code frontend) peut lire et modifier toutes les données de cette table.
+</Callout>
+
+</Layer>
+
+<Layer id="orm-client" order={7} title="ORM / Client" subtitle="L'intermédiaire (Prisma, Supabase JS)" icon="Plug">
+
+## Le traducteur entre ton code et ta base
+
+Écrire du SQL brut dans ton code JavaScript, c'est possible mais pénible. Les ORM (Object-Relational Mapping) et les clients de base de données traduisent tes opérations en SQL pour toi, avec une syntaxe adaptée à ton langage de programmation.
+
+Un **ORM** comme Prisma va plus loin qu'un simple client. Il génère des types TypeScript à partir de ton schéma de base, offre de l'autocomplétion dans ton IDE, gère les migrations (évolutions du schéma), et protège contre les injections SQL. Tu écris `prisma.user.findMany({ where: { age: { gt: 18 } } })` et Prisma génère le SQL optimisé.
+
+Un **client** comme Supabase JS est plus léger. Il expose les opérations de base avec une API fluide : `supabase.from('users').select('*').gt('age', 18)`. Il gère aussi l'authentification (les tokens JWT sont envoyés automatiquement) et le temps réel (les realtime subscriptions).
+
+Le choix entre les deux dépend de ton projet. Prisma est idéal si tu veux un typage strict et des migrations robustes. Supabase JS est idéal si tu utilises déjà Supabase et que tu veux quelque chose de rapide et intégré.
+
+<Analogy>
+Un ORM, c'est comme un interprète entre toi et un fournisseur étranger. Tu parles en français (JavaScript), l'interprète traduit en japonais (SQL) et te rapporte la réponse traduite. Tu n'as pas besoin de parler japonais, mais comprendre les bases aide quand il y a un malentendu (une requête lente ou un bug de données).
+</Analogy>
+
+<KeyConcept term="ORM (Object-Relational Mapping)">
+Un ORM fait correspondre les tables de ta base de données à des objets dans ton langage de programmation. La table `users` devient une classe/type `User`, les colonnes deviennent des propriétés, et les requêtes SQL deviennent des appels de méthodes. Prisma, Drizzle, TypeORM (TypeScript), SQLAlchemy (Python), ActiveRecord (Ruby) sont les ORM les plus connus. L'avantage : productivité et sécurité de type. Le risque : les requêtes générées ne sont pas toujours optimales (le "N+1 problem").
+</KeyConcept>
+
+<Example brand="Prisma">
+Avec Prisma, tu définis ton schéma dans un fichier `schema.prisma`. Prisma introspect ta base Supabase avec `prisma db pull`, génère les types TypeScript avec `prisma generate`, et te donne un client typé. `const users = await prisma.user.findMany()` renvoie un tableau de type `User[]` avec autocomplétion sur chaque propriété. Si tu changes le schéma, TypeScript te montre immédiatement tous les endroits à mettre à jour dans ton code.
+</Example>
+
+<Callout type="tip">
+Même si tu utilises un ORM, apprends les bases du SQL. Quand une requête est lente, tu devras comprendre le SQL généré pour l'optimiser. Et pour les requêtes complexes (CTEs, window functions, requêtes récursives), écrire du SQL brut est souvent plus clair et plus performant que de forcer l'ORM.
+</Callout>
+
+</Layer>
+
+<Layer id="application-bdd" order={8} title="Application" subtitle="L'interface qui affiche les données" icon="AppWindow">
+
+## La couche que les utilisateurs voient
+
+Tout ce qui précède -- disque, moteur, schéma, index, SQL, auth, ORM -- existe pour servir une seule chose : l'application que l'utilisateur final utilise. C'est le bout de la chaîne, là où les données deviennent des pages web, des dashboards, des listes de produits, des feeds sociaux.
+
+L'application envoie des requêtes à la base via l'ORM ou le client, reçoit les données en JSON, et les affiche dans l'interface. Un `useEffect` qui appelle `supabase.from('products').select('*')` au chargement de la page, c'est toutes les couches qui s'activent en quelques millisecondes : connexion TCP à la base, authentification du rôle, vérification RLS, exécution SQL, scan des index, lecture du disque, sérialisation en JSON, envoi via HTTPS.
+
+La performance perçue par l'utilisateur dépend de chaque couche. Une page lente peut venir d'un index manquant (couche 4), d'une requête mal écrite (couche 5), d'un ORM qui fait du N+1 (couche 7), ou simplement d'un serveur de base sous-dimensionné (couche 1). Savoir diagnostiquer à quelle couche se situe le problème, c'est la vraie compétence.
+
+<Analogy>
+L'application, c'est la vitrine d'un magasin. Le client voit les produits joliment disposés et ne sait rien de l'entrepôt (le disque), du système de rangement (le moteur), du catalogue (le schéma), du système de code-barres (les index), de la langue parlée avec les fournisseurs (SQL), du vigile (l'auth), ou du livreur (l'ORM). Tout ça est invisible mais indispensable pour que la vitrine fonctionne.
+</Analogy>
+
+<KeyConcept term="Latence de bout en bout">
+La latence de bout en bout est le temps total entre l'action de l'utilisateur et l'affichage du résultat. Elle inclut : la requête réseau (50-200ms), l'authentification de la connexion base (~5ms), l'exécution SQL (1-100ms selon la complexité), le transfert des données (~10ms), et le rendu frontend (~50ms). Supabase Dashboard affiche les temps d'exécution de chaque requête dans l'onglet Logs, ce qui aide à identifier les goulets d'étranglement.
+</KeyConcept>
+
+<Example brand="Netflix">
+Netflix stocke les données de ses 250 millions d'abonnés dans des bases de données distribuées. Quand tu ouvres l'app, des dizaines de requêtes partent en parallèle : ton profil, tes recommandations, les contenus tendances, l'historique de visionnage. Chaque requête traverse toutes les couches qu'on a décrites. Netflix optimise chaque couche : cache en mémoire (pour éviter le disque), index spécialisés (pour les recommandations), connection pooling (pour gérer des millions de connexions simultanées).
+</Example>
+
+<Callout type="info">
+Supabase offre des outils pour monitorer chaque couche : le Dashboard montre les requêtes lentes, les index manquants (via pg_stat_statements), l'utilisation disque et mémoire. L'onglet "Database > Advisors" te donne des recommandations automatiques. C'est un bon point de départ quand quelque chose rame.
+</Callout>
+
+</Layer>
+
+</LayerStack>

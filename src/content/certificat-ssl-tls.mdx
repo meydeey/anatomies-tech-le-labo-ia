@@ -1,0 +1,211 @@
+<LayerStack>
+
+<Layer id="texte-en-clair" order={1} title="Texte en clair" subtitle="Les données non protégées" icon="FileText">
+
+## Le problème : tout le monde peut lire
+
+Quand tu envoies des données sur Internet sans chiffrement, c'est comme envoyer une carte postale. N'importe qui entre toi et le destinataire peut lire le contenu : ton fournisseur d'accès, le Wi-Fi du café, un hacker sur le réseau. Ton mot de passe, ton numéro de carte bancaire, tes messages -- tout circule en texte lisible.
+
+Le protocole HTTP (sans le S) fonctionne exactement comme ça. Les données voyagent en clair entre ton navigateur et le serveur. Dans les années 90, c'était la norme. Aujourd'hui, c'est une faille de sécurité majeure.
+
+Le problème ne se limite pas à l'espionnage passif. Un attaquant peut aussi **modifier** les données en transit (attaque "man-in-the-middle"). Imagine que tu télécharges un logiciel : sans chiffrement, quelqu'un pourrait remplacer le fichier par un malware pendant le transfert, et tu ne le saurais jamais.
+
+<Analogy>
+HTTP sans chiffrement, c'est comme crier tes informations bancaires à travers une place publique bondée. Tout le monde autour peut entendre ton numéro de carte. Pire, quelqu'un pourrait même se mettre entre toi et la banque et modifier tes instructions -- "transférer 100 euros" pourrait devenir "transférer 10 000 euros vers un autre compte".
+</Analogy>
+
+<KeyConcept term="Texte en clair (Plaintext)">
+Le texte en clair désigne toute donnée transmise sans chiffrement, lisible par quiconque l'intercepte. Sur le web, ça correspond au protocole HTTP (port 80). Chaque donnée -- mot de passe, cookie de session, contenu de formulaire -- transite de manière visible sur le réseau. Les outils comme Wireshark permettent de capturer et lire ces données en quelques clics.
+</KeyConcept>
+
+<Example brand="Google">
+En 2014, Google a annoncé que HTTPS serait un facteur de ranking dans les résultats de recherche. Ce n'était pas juste pour la sécurité -- c'était pour forcer la main à tout le web. Résultat : on est passé de 40% de sites en HTTPS à plus de 95% en quelques années. Chrome marque maintenant les sites HTTP comme "Non sécurisé" avec un avertissement visible dans la barre d'adresse.
+</Example>
+
+</Layer>
+
+<Layer id="chiffrement-symetrique" order={2} title="Chiffrement symétrique" subtitle="Une seule clé pour chiffrer/déchiffrer" icon="KeyRound">
+
+## Une clé, une serrure
+
+Le chiffrement symétrique est la forme la plus intuitive de cryptographie. Tu as une seule clé qui sert à **chiffrer** et à **déchiffrer**. C'est rapide, c'est efficace, et c'est ce qui est utilisé pour le gros du trafic HTTPS.
+
+L'algorithme le plus courant est **AES** (Advanced Encryption Standard), utilisé par à peu près tout : HTTPS, WhatsApp, les disques chiffrés, les VPN. AES-256 (256 bits de clé) est considéré comme incassable -- il faudrait plus de temps que l'âge de l'univers pour tester toutes les combinaisons.
+
+Mais le chiffrement symétrique a un problème fondamental : comment partager la clé secrète ? Si tu l'envoies sur Internet, quelqu'un peut l'intercepter. C'est le problème de l'échange de clés, et c'est exactement ce que le chiffrement asymétrique (couche suivante) résout.
+
+<Analogy>
+C'est comme un coffre-fort avec une clé physique. Tu mets ton message dans le coffre, tu le verrouilles avec la clé, et tu envoies le coffre. Le destinataire utilise une copie de la même clé pour l'ouvrir. Le problème : comment lui donner la copie de la clé sans qu'un voleur ne l'intercepte en route ?
+</Analogy>
+
+<KeyConcept term="Chiffrement symétrique (AES)">
+Le chiffrement symétrique utilise la même clé pour chiffrer et déchiffrer les données. AES (Advanced Encryption Standard) est le standard actuel, disponible en clés de 128, 192 ou 256 bits. C'est extrêmement rapide (des milliards d'opérations par seconde grâce aux instructions hardware dédiées), ce qui le rend idéal pour chiffrer de grandes quantités de données. C'est le chiffrement utilisé une fois la connexion HTTPS établie.
+</KeyConcept>
+
+<Example brand="WhatsApp">
+Quand tu envoies un message sur WhatsApp, il est chiffré avec AES-256 en mode end-to-end. La clé de chiffrement est unique pour chaque conversation et chaque appareil. Même WhatsApp (Meta) ne peut pas lire tes messages -- ils n'ont pas la clé. C'est du chiffrement symétrique, mais l'échange initial de clés se fait via du chiffrement asymétrique (le Signal Protocol).
+</Example>
+
+</Layer>
+
+<Layer id="chiffrement-asymetrique" order={3} title="Chiffrement asymétrique" subtitle="Clé publique + clé privée" icon="KeySquare">
+
+## Deux clés qui se complètent
+
+Le chiffrement asymétrique résout le problème de l'échange de clés avec une idée géniale : au lieu d'une seule clé, tu en as **deux**. Une clé publique (que tout le monde peut voir) et une clé privée (que tu gardes secrète). Ce qui est chiffré avec l'une ne peut être déchiffré qu'avec l'autre.
+
+Concrètement : si quelqu'un veut t'envoyer un message secret, il le chiffre avec **ta clé publique**. Seule **ta clé privée** peut le déchiffrer. La clé publique peut être affichée partout, ça ne pose aucun problème de sécurité -- elle ne sert qu'à chiffrer, pas à déchiffrer.
+
+Le chiffrement asymétrique est beaucoup plus lent que le symétrique (environ 1000 fois). C'est pourquoi on ne l'utilise pas pour chiffrer tout le trafic. On l'utilise juste au début, pendant le handshake TLS, pour échanger en toute sécurité une clé symétrique. Ensuite, le chiffrement symétrique prend le relais pour les données.
+
+<Analogy>
+Imagine une boîte aux lettres. Tout le monde connaît l'adresse et peut y déposer une lettre (clé publique = la fente). Mais seul toi as la clé pour ouvrir la boîte et lire les lettres (clé privée). N'importe qui peut t'écrire, mais seul toi peux lire les messages.
+</Analogy>
+
+<KeyConcept term="Chiffrement asymétrique (RSA/ECC)">
+Le chiffrement asymétrique repose sur une paire de clés mathématiquement liées. RSA et ECC (Elliptic Curve Cryptography) sont les algorithmes les plus courants. La magie mathématique : il est facile de calculer la clé publique à partir de la clé privée, mais pratiquement impossible de faire l'inverse. ECC est plus moderne et offre la même sécurité que RSA avec des clés beaucoup plus courtes (256 bits ECC = 3072 bits RSA).
+</KeyConcept>
+
+<Example brand="Let's Encrypt">
+Quand tu génères un certificat SSL avec Let's Encrypt (via Certbot), l'outil crée automatiquement une paire de clés asymétriques. La clé publique est incluse dans le certificat (visible par tous les navigateurs), et la clé privée reste sur ton serveur (fichier `privkey.pem`). Si ta clé privée fuite, n'importe qui peut se faire passer pour ton site -- c'est pourquoi les certificats Let's Encrypt expirent tous les 90 jours et doivent être renouvelés.
+</Example>
+
+<Callout type="info">
+En pratique, le web utilise un système hybride : le chiffrement asymétrique pour l'échange initial de la clé (le handshake), puis le chiffrement symétrique pour les données. Tu obtiens le meilleur des deux mondes : la sécurité de l'asymétrique et la vitesse du symétrique.
+</Callout>
+
+</Layer>
+
+<Layer id="autorite-certification" order={4} title="Autorité de certification (CA)" subtitle="Le notaire du web" icon="BadgeCheck">
+
+## Le tiers de confiance qui garantit l'identité
+
+Le chiffrement protège les données en transit, mais il ne répond pas à une question cruciale : **comment savoir que tu parles au bon serveur ?** Un hacker pourrait créer un faux site Netflix avec sa propre paire de clés. Le chiffrement fonctionnerait parfaitement... vers le mauvais serveur.
+
+C'est là qu'intervient l'Autorité de Certification (CA). C'est un organisme de confiance qui vérifie l'identité du propriétaire d'un site et **signe** son certificat. Quand ton navigateur voit un certificat signé par une CA reconnue, il fait confiance au site. C'est une chaîne de confiance : tu fais confiance à ton navigateur, qui fait confiance aux CA, qui garantissent les sites.
+
+Les CA les plus connues sont Let's Encrypt (gratuit, automatisé), DigiCert, Comodo/Sectigo et GlobalSign. Ton navigateur embarque une liste de CA de confiance (le "trust store"). Si un certificat est signé par une CA qui n'est pas dans cette liste, le navigateur affiche un gros avertissement rouge.
+
+<Analogy>
+Une CA, c'est comme un notaire. Quand tu achètes un appartement, tu ne fais pas confiance au vendeur sur parole -- le notaire vérifie son identité, ses droits de propriété, et appose son tampon officiel sur l'acte. De la même façon, la CA vérifie que amazon.fr appartient bien à Amazon, et signe le certificat pour l'attester.
+</Analogy>
+
+<KeyConcept term="Autorité de Certification (CA)">
+Une CA est un organisme de confiance qui émet et signe des certificats numériques. Elle vérifie l'identité du demandeur (à différents niveaux : DV, OV ou EV) avant de signer. Les navigateurs embarquent une liste d'environ 150 CA racine de confiance. Si une CA est compromise (comme DigiNotar en 2011), elle est retirée de la liste et tous ses certificats deviennent invalides d'un coup.
+</KeyConcept>
+
+<Example brand="Let's Encrypt">
+Let's Encrypt a révolutionné le web en 2015 en proposant des certificats SSL **gratuits et automatisés**. Avant, un certificat coûtait 50 à 500 euros par an. Aujourd'hui, Let's Encrypt émet plus de 3 millions de certificats par jour. La vérification est automatique (DV -- Domain Validation) : tu prouves que tu contrôles le domaine en répondant à un challenge HTTP ou DNS, et le certificat est émis en quelques secondes. Certbot gère même le renouvellement automatique.
+</Example>
+
+</Layer>
+
+<Layer id="certificat-ssl" order={5} title="Certificat SSL" subtitle="La carte d'identité du site" icon="FileCheck">
+
+## La carte d'identité numérique de ton site
+
+Un certificat SSL/TLS, c'est un fichier qui contient plusieurs informations cruciales : le **nom de domaine** du site, la **clé publique** du serveur, le **nom de la CA** qui l'a signé, la **date d'expiration**, et la **signature numérique** de la CA.
+
+Il existe trois niveaux de validation. Le **DV** (Domain Validation) vérifie juste que tu contrôles le domaine -- c'est le plus courant (Let's Encrypt). Le **OV** (Organization Validation) vérifie aussi que l'organisation existe légalement. Le **EV** (Extended Validation) est le plus strict, avec vérification physique de l'entreprise -- historiquement, il affichait le nom de l'entreprise en vert dans la barre d'adresse (les navigateurs ont arrêté ça).
+
+Un certificat a une durée de vie limitée. Chez Let's Encrypt, c'est 90 jours. Les autres CA vont jusqu'à 1 an (Apple a poussé pour cette limite en 2020). L'expiration force le renouvellement régulier, ce qui limite les dégâts si une clé privée est compromise.
+
+<Analogy>
+Un certificat SSL, c'est comme une carte d'identité officielle. Elle contient ton nom (le domaine), ta photo (la clé publique), le tampon de la préfecture (la signature de la CA), et une date d'expiration. Quand quelqu'un te demande de prouver ton identité, tu montres ta carte. Si le tampon est reconnu et la carte n'est pas expirée, on te fait confiance.
+</Analogy>
+
+<KeyConcept term="Certificat X.509">
+Le format standard des certificats SSL est le X.509. Il contient : le numéro de série, l'algorithme de signature, le nom de l'émetteur (CA), les dates de validité, le sujet (le domaine), la clé publique, et la signature. Tu peux voir le certificat de n'importe quel site en cliquant sur le cadenas dans ton navigateur > "Connexion sécurisée" > "Le certificat est valide".
+</KeyConcept>
+
+<Example brand="Vercel">
+Quand tu déploies un site sur Vercel, tu n'as même pas à penser aux certificats SSL. Vercel provisionne automatiquement un certificat via Let's Encrypt pour chaque domaine configuré, et gère le renouvellement en arrière-plan. Tu obtiens HTTPS gratuitement et sans configuration. C'est la même chose avec Netlify, Cloudflare Pages et la plupart des plateformes modernes -- le SSL est devenu un commodité, pas une corvée.
+</Example>
+
+<Callout type="tip">
+Tu peux inspecter le certificat de n'importe quel site en cliquant sur le cadenas dans la barre d'adresse de Chrome, puis "La connexion est sécurisée" > "Le certificat est valide". Tu verras le domaine, la CA, les dates de validité et la chaîne de certificats complète.
+</Callout>
+
+</Layer>
+
+<Layer id="handshake-tls" order={6} title="Handshake TLS" subtitle="La poignée de main sécurisée" icon="Handshake">
+
+## La négociation secrète en quelques millisecondes
+
+Le TLS handshake, c'est la danse qui se passe entre ton navigateur et le serveur **avant** qu'un seul octet de données ne soit échangé. Ça dure environ 50-100ms et ça se passe à chaque nouvelle connexion HTTPS.
+
+Voici les étapes simplifiées : (1) Ton navigateur dit "Salut, je veux parler en HTTPS, voici les algorithmes de chiffrement que je connais". (2) Le serveur répond "OK, utilisons celui-ci, et voici mon certificat". (3) Ton navigateur vérifie le certificat auprès de la CA. (4) Les deux parties génèrent ensemble une **clé de session** symétrique en utilisant le chiffrement asymétrique (Diffie-Hellman). (5) À partir de maintenant, tout est chiffré avec cette clé symétrique.
+
+TLS 1.3 (la version actuelle) a simplifié ce processus : le handshake ne prend plus qu'un aller-retour (1-RTT) au lieu de deux. Certaines connexions répétées peuvent même faire un 0-RTT (zéro aller-retour supplémentaire), ce qui est quasi instantané.
+
+<Analogy>
+C'est comme deux espions qui se rencontrent dans un parc. D'abord, ils vérifient mutuellement leurs identités avec des codes secrets (vérification du certificat). Puis ils conviennent d'un langage codé pour la conversation (clé de session). Ensuite seulement, ils commencent à parler du sujet confidentiel. Si quelqu'un les espionne, il voit juste deux personnes qui échangent du charabia incompréhensible.
+</Analogy>
+
+<KeyConcept term="TLS Handshake">
+Le TLS handshake est le processus de négociation qui établit une connexion sécurisée. Les deux parties se mettent d'accord sur la version du protocole, les algorithmes de chiffrement (cipher suite), vérifient l'identité du serveur via son certificat, et génèrent une clé de session partagée via l'échange Diffie-Hellman. TLS 1.3 a supprimé les algorithmes obsolètes et réduit le handshake à 1 seul aller-retour.
+</KeyConcept>
+
+<Example brand="Cloudflare">
+Cloudflare agit comme proxy TLS pour des millions de sites. Quand tu visites un site derrière Cloudflare, le TLS handshake se fait avec le serveur Cloudflare le plus proche de toi (edge server), pas avec le serveur d'origine qui peut être à l'autre bout du monde. Résultat : le handshake est plus rapide (moins de latence réseau). Cloudflare force aussi TLS 1.3 et peut activer 0-RTT pour les visiteurs récurrents.
+</Example>
+
+</Layer>
+
+<Layer id="https" order={7} title="HTTPS" subtitle="HTTP + la couche de sécurité" icon="ShieldCheck">
+
+## HTTP en armure
+
+HTTPS, c'est littéralement HTTP + S (Secure). C'est le même protocole HTTP que tu connais (GET, POST, headers, body...), mais encapsulé dans une couche TLS qui chiffre tout. Le serveur écoute sur le port 443 au lieu du port 80.
+
+Ce que HTTPS protège : la **confidentialité** (personne ne peut lire les données en transit), l'**intégrité** (personne ne peut modifier les données sans que ça soit détecté), et l'**authenticité** (tu parles bien au bon serveur, pas à un imposteur).
+
+Ce que HTTPS ne protège PAS : il ne cache pas le nom de domaine que tu visites (le SNI est en clair, même si ça change avec ECH), il ne protège pas contre les malwares une fois les données arrivées, et il ne garantit pas que le site est légitime -- un site de phishing peut avoir un certificat SSL valide.
+
+<Analogy>
+Si HTTP est une lettre dans une enveloppe transparente, HTTPS c'est la même lettre dans une enveloppe opaque, scellée avec de la cire, et livrée par un coursier vérifié. Le contenu de la lettre est le même, mais personne en route ne peut la lire, la modifier ou se faire passer pour l'expéditeur.
+</Analogy>
+
+<KeyConcept term="HTTPS (HTTP Secure)">
+HTTPS est HTTP encapsulé dans TLS. Techniquement, le navigateur établit d'abord une connexion TCP, puis effectue le handshake TLS, et ensuite seulement envoie la requête HTTP à l'intérieur du tunnel chiffré. Tout le trafic HTTP (URL, headers, body, cookies) est chiffré. Seuls le domaine (via SNI) et les adresses IP restent visibles pour un observateur réseau.
+</KeyConcept>
+
+<Example brand="Stripe">
+Stripe, le service de paiement en ligne, exige HTTPS pour toute intégration. Si tu essaies d'intégrer Stripe sur un site HTTP, ça ne marchera tout simplement pas -- le JavaScript de Stripe refuse de charger. C'est logique : tu ne veux pas que les numéros de carte bancaire de tes clients circulent en clair. Stripe va même plus loin avec le HSTS preloading (ton navigateur refuse automatiquement le HTTP pour stripe.com).
+</Example>
+
+<Callout type="warning">
+Un cadenas dans la barre d'adresse ne signifie PAS que le site est sûr. Il signifie juste que la connexion est chiffrée. Un site de phishing qui imite ta banque peut parfaitement avoir un certificat SSL valide (DV). Le cadenas protège le canal, pas le contenu.
+</Callout>
+
+</Layer>
+
+<Layer id="cadenas-vert" order={8} title="Cadenas vert" subtitle="Ce que voit l'utilisateur" icon="Lock">
+
+## Ce petit cadenas qui change tout
+
+Le cadenas dans la barre d'adresse, c'est la partie visible de tout ce qu'on vient de décrire. C'est la finalité : informer l'utilisateur que sa connexion est sécurisée. Derrière ce simple icône, il y a toute la chaîne -- chiffrement symétrique, asymétrique, certificat, CA, handshake TLS.
+
+Quand le navigateur affiche le cadenas, il a vérifié plusieurs choses : le certificat est valide et non expiré, il a été signé par une CA de confiance, le domaine correspond, et le handshake TLS s'est déroulé correctement. Si un seul de ces éléments échoue, le cadenas disparaît et un avertissement apparaît.
+
+L'absence de cadenas (ou pire, un avertissement "Non sécurisé") a un impact direct sur le business. Les études montrent que 85% des utilisateurs quittent un site qui affiche un avertissement de sécurité. Google pénalise les sites HTTP dans ses résultats. Les formulaires sur HTTP déclenchent des alertes dans Chrome et Firefox. En 2026, ne pas avoir HTTPS n'est plus une option.
+
+<Analogy>
+Le cadenas, c'est comme le logo "certifié bio" sur un produit alimentaire. Tu ne vas pas toi-même tester la composition chimique du produit -- tu fais confiance au label. De la même façon, tu ne vas pas analyser les paquets réseau -- tu fais confiance au cadenas. Dans les deux cas, un organisme tiers (la CA / l'organisme de certification bio) a fait les vérifications pour toi.
+</Analogy>
+
+<KeyConcept term="HSTS (HTTP Strict Transport Security)">
+HSTS est un header HTTP qui dit au navigateur : "Ne me contacte PLUS JAMAIS en HTTP, toujours en HTTPS". Une fois reçu, le navigateur convertit automatiquement toute requête HTTP vers ce domaine en HTTPS, sans même tenter la version non sécurisée. Le HSTS preloading va encore plus loin : le domaine est inclus directement dans le code du navigateur, donc même la toute première visite est en HTTPS.
+</KeyConcept>
+
+<Example brand="Amazon">
+Amazon utilise HSTS avec preloading pour tous ses domaines. Quand tu tapes "amazon.fr" dans ton navigateur, il n'essaie même pas le HTTP -- il va directement en HTTPS. Amazon affiche aussi des badges "Connexion sécurisée" à des endroits stratégiques (page de paiement, page de connexion) pour rassurer les utilisateurs. Ce n'est pas juste de la sécurité technique, c'est aussi de la psychologie -- les gens achètent plus quand ils se sentent en sécurité.
+</Example>
+
+<Callout type="info">
+Chrome a progressivement changé sa façon d'afficher la sécurité. Avant, HTTPS avait un cadenas vert visible. Maintenant, HTTPS est considéré comme la norme (pas de cadenas spécial) et c'est HTTP qui est pénalisé avec "Non sécurisé". Le message est clair : HTTPS n'est plus un bonus, c'est le minimum.
+</Callout>
+
+</Layer>
+
+</LayerStack>

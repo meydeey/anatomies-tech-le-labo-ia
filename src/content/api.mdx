@@ -1,0 +1,209 @@
+<LayerStack>
+
+<Layer id="donnees-brutes" order={1} title="Donnees brutes" subtitle="L'information stockee (BDD, fichiers)" icon="Database">
+
+## La matiere premiere
+
+Toute API commence par des donnees. Ces donnees vivent quelque part : dans une base de donnees PostgreSQL, dans des fichiers sur un disque, dans un cache Redis, ou meme dans un autre service. Ce sont les donnees brutes, la matiere premiere que l'API va exposer au monde exterieur.
+
+Sans donnees, une API n'a rien a servir. C'est comme un restaurant sans ingredients. Les donnees peuvent etre des utilisateurs, des produits, des transactions, des messages, des images — tout ce que ton application manipule.
+
+Le role de l'API est justement de ne jamais exposer ces donnees brutes directement. Tu ne veux pas que quelqu'un accede a ta base de donnees en direct. L'API est l'intermediaire qui controle ce qu'on peut voir, modifier ou supprimer.
+
+<Analogy>
+Les donnees brutes, c'est la reserve du supermarche. Tout est la : les palettes de produits, les cartons non ouverts, le stock en vrac. Mais les clients n'y ont pas acces directement. Ils passent par les rayons (l'API), qui exposent les produits de facon organisee et controlee.
+</Analogy>
+
+<KeyConcept term="Donnees brutes (Raw Data)">
+Les donnees brutes sont les informations stockees dans leur forme originale, avant tout traitement ou mise en forme. Dans le contexte d'une API, ce sont les donnees en base (tables, colonnes, lignes) ou dans des fichiers que l'API va lire, transformer et exposer de facon structuree.
+</KeyConcept>
+
+<Example brand="Spotify">
+Spotify stocke des milliards de lignes de donnees : les titres de chansons, les artistes, les pochettes d'albums, l'historique d'ecoute de chaque utilisateur, les playlists. Tout ca vit dans des bases de donnees massives. L'API de Spotify ne donne jamais acces a ces bases directement — elle sert des morceaux specifiques de ces donnees, formatees proprement en JSON.
+</Example>
+
+</Layer>
+
+<Layer id="logique-metier" order={2} title="Logique metier" subtitle="Les regles de traitement" icon="Cog">
+
+## Les regles du jeu
+
+Entre les donnees brutes et ce que l'API renvoie, il y a la logique metier. Ce sont les regles qui definissent comment les donnees doivent etre traitees. Un utilisateur peut-il voir cette ressource ? Le prix inclut-il la TVA ? Un utilisateur gratuit a-t-il le droit d'acceder a cette fonctionnalite ?
+
+La logique metier est le cerveau de l'API. C'est elle qui valide les donnees entrantes ("cet email est-il valide ?"), applique les calculs ("prix x quantite - reduction"), gere les contraintes ("un utilisateur ne peut pas s'auto-suivre") et orchestre les operations complexes ("creer un compte, envoyer un email de bienvenue, offrir 30 jours d'essai").
+
+Cette couche est invisible pour celui qui consomme l'API, mais c'est la plus importante. C'est elle qui differencie une API utile d'une simple interface vers une base de donnees.
+
+<Analogy>
+La logique metier, c'est le chef cuisinier. Les ingredients bruts sont la (les donnees), mais c'est le chef qui decide de la recette : combien de sel, quelle cuisson, quelle presentation. Deux restaurants peuvent avoir les memes ingredients mais servir des plats completement differents. La logique metier, c'est ce qui fait la difference.
+</Analogy>
+
+<KeyConcept term="Logique metier (Business Logic)">
+La logique metier regroupe toutes les regles, validations et traitements specifiques a ton application. C'est le code qui repond aux questions "qui a le droit de faire quoi ?", "comment calcule-t-on ce resultat ?" et "que se passe-t-il si cette condition est remplie ?". Elle transforme des donnees brutes en reponses intelligentes.
+</KeyConcept>
+
+<Example brand="Stripe">
+Quand tu appelles l'API Stripe pour creer un paiement, la logique metier est enorme : verifier que la carte est valide, contacter la banque emettrice, gerer les devises, calculer les frais, verifier les regles anti-fraude, creer la transaction, envoyer les webhooks de notification. Tu envoies une simple requete POST, mais derriere, des dizaines de regles metier s'executent.
+</Example>
+
+</Layer>
+
+<Layer id="endpoints-routes" order={3} title="Endpoints / Routes" subtitle="Les URLs d'acces" icon="Route">
+
+## Les portes d'entree
+
+Un endpoint (ou route), c'est une URL specifique qui donne acces a une ressource ou une action precise de l'API. C'est l'adresse que tu appelles pour obtenir ou manipuler des donnees. Chaque endpoint correspond a une fonctionnalite.
+
+Les bons endpoints suivent une convention : ils sont organises autour des **ressources** (les "choses" que l'API manipule). Par exemple : `/users` pour les utilisateurs, `/products` pour les produits, `/orders` pour les commandes. On ajoute un ID pour cibler une ressource precise : `/users/42` pour l'utilisateur numero 42.
+
+La conception des endpoints est un art. Des URLs claires et previsibles rendent l'API intuitive. Si tu connais `/users` et `/products`, tu peux deviner que `/orders` existe aussi. C'est le principe des APIs RESTful.
+
+<Analogy>
+Les endpoints, ce sont les differents guichets d'une mairie. Tu ne vas pas au meme guichet pour un passeport, un acte de naissance ou une inscription sur les listes electorales. Chaque guichet (endpoint) a une fonction precise et une adresse claire. Si les guichets sont bien signales, tu trouves immediatement ou aller.
+</Analogy>
+
+<KeyConcept term="Endpoint">
+Un endpoint est une URL specifique exposee par une API, associee a une methode HTTP, qui permet d'effectuer une operation precise. Par exemple, `GET /api/users` liste les utilisateurs, `POST /api/users` en cree un nouveau. L'ensemble des endpoints forme la "surface" de l'API — tout ce qu'elle expose au monde exterieur.
+</KeyConcept>
+
+<Example brand="GitHub">
+L'API GitHub a des centaines d'endpoints parfaitement organises. `GET /repos/facebook/react` retourne les infos du repo React de Facebook. `GET /repos/facebook/react/issues` liste les issues. `POST /repos/facebook/react/issues` en cree une nouvelle. La structure est logique : tu navigues dans l'API comme dans un systeme de fichiers.
+</Example>
+
+<Callout type="tip">
+Dans n8n, quand tu configures un noeud HTTP Request, le champ URL correspond a l'endpoint. Si l'API est bien concue, l'URL elle-meme te dit ce que tu vas obtenir.
+</Callout>
+
+</Layer>
+
+<Layer id="methodes-http" order={4} title="Methodes HTTP" subtitle="GET, POST, PUT, DELETE" icon="ArrowRightLeft">
+
+## Les verbes de l'action
+
+L'endpoint dit **ou** tu veux agir. La methode HTTP dit **quoi** tu veux faire. Ce sont les "verbes" de l'API. Les quatre principaux forment le CRUD — les quatre operations fondamentales sur les donnees.
+
+`GET` = lire (Read). Tu demandes des informations sans rien modifier. `POST` = creer (Create). Tu envoies des donnees pour creer une nouvelle ressource. `PUT` ou `PATCH` = modifier (Update). Tu mets a jour une ressource existante. `DELETE` = supprimer (Delete). Tu supprimes une ressource.
+
+La meme URL peut faire des choses differentes selon la methode. `GET /users/42` retourne les infos de l'utilisateur 42. `PUT /users/42` modifie cet utilisateur. `DELETE /users/42` le supprime. L'URL est la meme, c'est la methode qui change l'intention.
+
+<Analogy>
+Les methodes HTTP, c'est comme les actions que tu fais sur une fiche dans un classeur. GET = tu lis la fiche sans la toucher. POST = tu ajoutes une nouvelle fiche. PUT = tu remplaces une fiche existante par une version mise a jour. DELETE = tu retires la fiche du classeur. La fiche (l'endpoint) est la meme, mais ton action change tout.
+</Analogy>
+
+<KeyConcept term="CRUD">
+CRUD signifie Create, Read, Update, Delete — les quatre operations de base sur les donnees. C'est le fondement de quasiment toute application. Chaque operation correspond a une methode HTTP : POST (Create), GET (Read), PUT/PATCH (Update), DELETE (Delete). Quand tu entends "API CRUD", ca veut dire une API qui permet ces quatre operations.
+</KeyConcept>
+
+<Example brand="Notion">
+L'API Notion suit parfaitement le modele CRUD. `POST /v1/pages` cree une nouvelle page. `GET /v1/pages/{id}` lit une page existante. `PATCH /v1/pages/{id}` modifie les proprietes d'une page. `DELETE /v1/blocks/{id}` supprime un bloc. Chaque action est clairement associee a une methode HTTP.
+</Example>
+
+</Layer>
+
+<Layer id="format-donnees" order={5} title="Format de donnees" subtitle="JSON, XML (le langage commun)" icon="Braces">
+
+## La langue commune
+
+Pour que deux logiciels se comprennent, ils doivent parler la meme langue. Le format de donnees, c'est cette langue. Aujourd'hui, le standard quasi-universel est le **JSON** (JavaScript Object Notation). C'est un format texte simple, lisible par les humains et facile a parser par les machines.
+
+Un objet JSON ressemble a ca : des paires cle-valeur entre accolades. `{"name": "Marie", "age": 28, "premium": true}`. C'est intuitif, leger, et supporte par tous les langages de programmation. Avant JSON, le format dominant etait XML — plus verbeux et moins lisible.
+
+Quand tu envoies des donnees a une API (dans le body d'un POST), tu les envoies en JSON. Quand l'API te repond, elle te repond en JSON. Le header `Content-Type: application/json` indique ce format. Dans n8n, chaque noeud manipule des donnees JSON — c'est la lingua franca de l'automatisation.
+
+<Analogy>
+JSON, c'est l'anglais du monde des APIs. Peu importe que le serveur soit ecrit en Python et le client en JavaScript — ils communiquent en JSON, comme deux personnes de pays differents qui se parlent en anglais. Tout le monde le comprend, c'est simple, et ca fait le job.
+</Analogy>
+
+<KeyConcept term="JSON (JavaScript Object Notation)">
+JSON est un format d'echange de donnees leger et lisible. Il utilise des paires cle-valeur, des tableaux et des objets imbriques pour representer des donnees structurees. C'est le format standard des APIs web modernes, supporte nativement par JavaScript et par des librairies dans tous les autres langages.
+</KeyConcept>
+
+<Example brand="OpenAI">
+Quand tu appelles l'API d'OpenAI pour generer du texte avec GPT, tu envoies du JSON : `{"model": "gpt-4", "messages": [{"role": "user", "content": "Bonjour"}]}`. Et tu recois du JSON en retour : `{"choices": [{"message": {"content": "Bonjour ! Comment puis-je vous aider ?"}}]}`. Tout l'echange se fait en JSON.
+</Example>
+
+</Layer>
+
+<Layer id="authentification-api" order={6} title="Authentification" subtitle="Qui a le droit d'appeler" icon="KeyRound">
+
+## Montrer patte blanche
+
+Une API ouverte a tout le monde sans controle, c'est une catastrophe. L'authentification repond a la question : "Qui es-tu et as-tu le droit d'etre la ?" Plusieurs mecanismes existent, du plus simple au plus securise.
+
+La **cle API** (API Key) est la methode la plus simple : un long code unique que tu inclus dans tes requetes. C'est comme un badge d'acces. Si tu as la cle, tu entres. Le probleme : si quelqu'un vole ta cle, il a acces a tout.
+
+**OAuth 2.0** est plus sophistique. C'est le mecanisme derriere "Se connecter avec Google". L'utilisateur autorise une app a acceder a ses donnees sans partager son mot de passe. Ca genere un **token** (jeton) temporaire avec des permissions limitees.
+
+Les **JWT** (JSON Web Tokens) sont des tokens auto-contenus qui portent eux-memes les informations sur l'utilisateur. Le serveur n'a pas besoin de verifier dans sa base a chaque requete — il decode le token et sait immediatement qui appelle.
+
+<Analogy>
+L'authentification API, c'est le systeme de securite d'un immeuble de bureaux. La cle API, c'est le badge magnetique — simple mais si tu le perds, n'importe qui peut entrer. OAuth, c'est le vigile qui appelle le bureau pour confirmer que tu es attendu. JWT, c'est un badge temporaire avec ta photo, ton nom et les etages autorises imprimes dessus.
+</Analogy>
+
+<KeyConcept term="API Key">
+Une cle API est une chaine de caracteres unique et secrete qui identifie l'appelant d'une API. Elle se transmet generalement dans un header (`Authorization: Bearer sk-xxx...`) ou en parametre d'URL. C'est la methode d'authentification la plus repandue pour les APIs de services (OpenAI, Stripe, SendGrid...).
+</KeyConcept>
+
+<Example brand="Supabase">
+Supabase utilise deux cles API : une **anon key** (publique, pour le frontend, avec des permissions limitees par les Row Level Security policies) et une **service role key** (secrete, acces total, uniquement cote serveur). Cette separation permet d'utiliser la meme API depuis le navigateur de l'utilisateur ET depuis ton backend, avec des niveaux de securite differents.
+</Example>
+
+<Callout type="warning">
+Ne commite jamais tes cles API dans ton code source (meme dans un repo prive). Utilise des variables d'environnement (.env). Dans n8n, utilise les Credentials natifs plutot que de coller tes cles dans les noeuds.
+</Callout>
+
+</Layer>
+
+<Layer id="documentation" order={7} title="Documentation" subtitle="Le mode d'emploi (Swagger, OpenAPI)" icon="BookOpen">
+
+## Le mode d'emploi
+
+Une API sans documentation, c'est un produit IKEA sans notice. Techniquement ca marche, mais personne ne sait comment l'utiliser. La documentation decrit chaque endpoint, ses parametres, les formats de requete et de reponse, les codes d'erreur possibles, et des exemples concrets.
+
+Le standard de documentation s'appelle **OpenAPI** (anciennement Swagger). C'est une specification qui decrit une API dans un format structure (JSON ou YAML). A partir de cette spec, des outils generent automatiquement une documentation interactive ou tu peux meme tester les endpoints directement dans le navigateur.
+
+Les bonnes documentations incluent des exemples de code dans plusieurs langages, des guides de demarrage rapide, des tutoriels pour les cas d'usage courants, et une reference exhaustive de chaque endpoint. Certaines vont meme plus loin en proposant des SDKs — des librairies pretes a l'emploi pour appeler l'API.
+
+<Analogy>
+La documentation d'une API, c'est le menu d'un restaurant. Sans menu, tu ne sais pas ce qui est disponible, a quel prix, ni quels sont les ingredients. Un bon menu te donne le nom du plat (l'endpoint), la description (ce qu'il fait), les ingredients et allergenes (les parametres), et parfois une photo (un exemple de reponse).
+</Analogy>
+
+<KeyConcept term="OpenAPI (Swagger)">
+OpenAPI est une specification standard pour decrire les APIs REST. Elle definit un format (JSON/YAML) pour lister tous les endpoints, parametres, schemas de donnees, methodes d'authentification et codes de reponse. Des outils comme Swagger UI transforment cette spec en documentation interactive consultable dans le navigateur.
+</KeyConcept>
+
+<Example brand="Stripe">
+Stripe est unanimement considere comme la reference en matiere de documentation API. Chaque endpoint est documente avec des exemples dans 8 langages, un panneau de test interactif, des guides thematiques (paiements, abonnements, remboursements), et meme des webhooks simules. C'est tellement bien fait que d'autres entreprises copient leur format.
+</Example>
+
+</Layer>
+
+<Layer id="consommateur" order={8} title="Consommateur" subtitle="L'app ou le service qui utilise l'API" icon="AppWindow">
+
+## Celui qui consomme
+
+Au bout de la chaine, il y a le **consommateur** — l'application, le service ou la personne qui utilise l'API. Ca peut etre une app mobile, un site web, un workflow n8n, un script Python, ou meme un autre API qui chaine les appels.
+
+Le consommateur ne sait rien (et n'a pas besoin de savoir) de ce qui se passe derriere l'API. Il ne connait pas la base de donnees, ni le langage du serveur, ni l'infrastructure. Il connait juste les endpoints, les methodes, le format de donnees et son token d'authentification. C'est le principe d'**abstraction** : l'API cache la complexite.
+
+C'est cette abstraction qui rend les APIs si puissantes. Tu peux utiliser l'API de Stripe sans rien connaitre de leur infrastructure. Tu peux appeler l'API d'OpenAI sans comprendre les reseaux de neurones. L'API est le contrat : "envoie-moi ca, je te renvoie ca."
+
+<Analogy>
+Le consommateur d'API, c'est comme le client d'un distributeur automatique. Tu mets ta piece (l'authentification), tu appuies sur le bouton (l'endpoint + la methode), et tu recuperes ton produit (la reponse). Tu n'as aucune idee de comment fonctionne le mecanisme interne. Et c'est exactement le but.
+</Analogy>
+
+<KeyConcept term="Consommateur d'API (API Consumer)">
+Un consommateur d'API est tout systeme qui envoie des requetes a une API pour utiliser ses fonctionnalites. Il peut etre un frontend (React, Next.js), un backend (Node.js, Python), un outil no-code (n8n, Zapier, Make), une app mobile, ou meme une autre API. Le consommateur interagit uniquement via le contrat defini par l'API, sans connaitre l'implementation interne.
+</KeyConcept>
+
+<Example brand="n8n">
+n8n est un consommateur d'APIs professionnel. Chaque noeud d'integration (Slack, Google Sheets, Notion, OpenAI) est en realite un consommateur qui appelle l'API du service correspondant. Quand tu connectes un noeud "Google Sheets" a un noeud "Slack", n8n consomme l'API Google Sheets pour lire les donnees, puis consomme l'API Slack pour envoyer un message. Tu orchestres des APIs sans ecrire une ligne de code.
+</Example>
+
+<Callout type="info">
+En tant que vibecoder, tu es constamment consommateur d'APIs — meme sans le savoir. Chaque noeud n8n, chaque integration Supabase, chaque appel a Claude ou GPT passe par une API. Comprendre cette anatomie te permet de debugger quand ca ne marche pas et de creer des integrations plus robustes.
+</Callout>
+
+</Layer>
+
+</LayerStack>

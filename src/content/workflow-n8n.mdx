@@ -1,0 +1,219 @@
+<LayerStack>
+
+<Layer id="trigger-declencheur" order={1} title="Trigger / Déclencheur" subtitle="L'événement qui démarre le workflow" icon="Zap">
+
+## Tout commence par un signal
+
+Un workflow n8n ne tourne pas en permanence -- il **attend** un signal pour démarrer. Ce signal, c'est le trigger. Sans trigger, ton workflow est comme une machine éteinte : il existe mais ne fait rien.
+
+Il y a deux grandes familles de triggers. Les **triggers événementiels** qui réagissent à quelque chose qui se passe : un webhook reçu, un email qui arrive, un message Slack, un nouveau row dans Google Sheets, un paiement Stripe. Et les **triggers temporels** (Schedule/Cron) qui se déclenchent à intervalles réguliers : toutes les 5 minutes, tous les jours à 9h, le 1er de chaque mois.
+
+Le choix du trigger détermine tout le workflow. Un webhook trigger reçoit des données en temps réel (un formulaire soumis, un paiement confirmé), tandis qu'un Schedule trigger devra aller chercher les données lui-même (polling). En général, le webhook est préférable quand c'est possible -- c'est plus réactif et plus efficace.
+
+<Analogy>
+Le trigger, c'est la sonnette de ta porte d'entrée. Soit quelqu'un sonne (webhook -- événement externe), soit tu as programmé un réveil pour aller vérifier la boîte aux lettres toutes les heures (cron -- vérification périodique). Dans les deux cas, c'est le signal de départ pour faire quelque chose.
+</Analogy>
+
+<KeyConcept term="Webhook Trigger">
+Un webhook est une URL que tu donnes à un service externe. Quand un événement se produit sur ce service, il envoie une requête HTTP (POST) à cette URL avec les données de l'événement. Dans n8n, le node "Webhook" crée cette URL automatiquement. Dès qu'une requête arrive sur cette URL, le workflow démarre avec les données reçues. C'est du "push" (le service te prévient) plutôt que du "pull" (tu vas vérifier régulièrement).
+</KeyConcept>
+
+<Example brand="Stripe">
+Tu configures un webhook Stripe qui pointe vers ton workflow n8n. À chaque nouveau paiement réussi, Stripe envoie un événement `payment_intent.succeeded` avec les détails (montant, client, email). Ton workflow n8n démarre instantanément, envoie un email de confirmation au client, met à jour ta base Supabase, et notifie ton channel Slack. Tout ça en quelques secondes, sans que tu lèves le petit doigt.
+</Example>
+
+<Callout type="tip">
+Préfère les webhooks au Schedule Trigger quand c'est possible. Un webhook réagit en temps réel (latence de quelques secondes) tandis qu'un cron a un délai moyen de la moitié de son intervalle. Un cron "toutes les 5 minutes" a en moyenne 2.5 minutes de retard. Pour les cas critiques (paiements, alertes), le webhook est indispensable.
+</Callout>
+
+</Layer>
+
+<Layer id="donnees-entree" order={2} title="Données d'entrée" subtitle="Les informations reçues (JSON)" icon="FileJson">
+
+## Le carburant du workflow
+
+Quand le trigger se déclenche, il fournit des données au workflow. Ces données arrivent toujours au format **JSON** -- le langage universel que parlent tous les services web. Comprendre la structure de ce JSON, c'est comprendre ce que ton workflow a à sa disposition pour travailler.
+
+Un webhook Stripe envoie un JSON massif avec des dizaines de champs imbriqués. Un Schedule Trigger n'envoie rien du tout (c'est au workflow d'aller chercher les données). Un trigger "New Row in Google Sheets" envoie un JSON avec les valeurs de chaque colonne de la nouvelle ligne.
+
+Dans n8n, chaque node reçoit et produit des **items**. Un item, c'est un objet JSON. Si un node reçoit 5 items, il les traite un par un (par défaut). C'est crucial de comprendre ce concept : quand tu connectes un node "HTTP Request" après un node qui produit 10 items, le HTTP Request sera exécuté 10 fois -- une fois par item.
+
+<Analogy>
+Les données d'entrée, c'est le bon de commande qui arrive sur le bureau d'un employé. Le bon contient toutes les informations nécessaires : nom du client, adresse, produits commandés, montant. Sans ce bon, l'employé ne sait pas quoi faire. Et si le bon est mal rempli (JSON mal formaté), le travail ne peut pas être fait correctement.
+</Analogy>
+
+<KeyConcept term="Items dans n8n">
+Dans n8n, les données circulent entre les nodes sous forme d'items. Chaque item est un objet JSON. Un node peut recevoir 1 ou plusieurs items, et produire 0, 1 ou plusieurs items en sortie. Le node "Split In Batches" découpe N items en lots, le node "Merge" combine les items de plusieurs branches. Comprendre le flux d'items est la clé pour débugger un workflow qui ne se comporte pas comme prévu.
+</KeyConcept>
+
+<Example brand="n8n">
+Dans n8n, clique sur n'importe quel node après exécution et tu verras les données sous 3 formats : Table (vue tableau), JSON (le brut), et Schema (la structure). Le panneau de gauche montre l'input (ce que le node a reçu) et le panneau de droite montre l'output (ce qu'il a produit). C'est l'outil de debug le plus puissant de n8n -- utilise-le systématiquement.
+</Example>
+
+<Callout type="info">
+Quand tu ne sais pas quelle structure de données un trigger envoie, active le workflow en mode "Listen for test event" sur le node Webhook, puis déclenche l'événement manuellement. n8n te montrera le JSON exact reçu. C'est la méthode la plus fiable pour découvrir les données disponibles.
+</Callout>
+
+</Layer>
+
+<Layer id="noeuds-traitement" order={3} title="Noeuds de traitement" subtitle="Transformer, filtrer, enrichir" icon="Cog">
+
+## Le cerveau du workflow
+
+Les nodes de traitement, c'est là que la magie opère. Ils prennent les données d'entrée et les **transforment** : renommer des champs, calculer des valeurs, formater des dates, fusionner des informations de plusieurs sources, nettoyer du texte.
+
+Le node **Set** (ou "Edit Fields") est probablement celui que tu utilises le plus. Il te permet de créer de nouveaux champs, renommer des existants, ou ne garder que certains champs. Tu reçois un JSON avec 50 champs de Stripe mais tu n'as besoin que de `email`, `amount` et `currency` ? Un node Set fait le tri.
+
+Le node **Code** est le couteau suisse : tu écris du JavaScript (ou Python) pour faire exactement ce que tu veux. Calculs complexes, manipulation de texte, formatage de données -- quand les nodes visuels ne suffisent pas, le Code node prend le relais. Mais attention : utilise-le en dernier recours, pas en premier réflexe. Les nodes visuels sont plus faciles à maintenir et à comprendre pour quelqu'un qui reprend ton workflow.
+
+<Analogy>
+Les nodes de traitement, c'est la cuisine d'un restaurant. Les ingrédients bruts (données d'entrée) arrivent du fournisseur. Le cuisinier les lave (nettoyage), les découpe (extraction), les assaisonne (enrichissement) et les combine (fusion) pour créer le plat final. Chaque étape de préparation est un node différent.
+</Analogy>
+
+<KeyConcept term="Expression n8n">
+Les expressions n8n permettent d'accéder dynamiquement aux données dans les champs des nodes. La syntaxe `{{ $json.email }}` récupère le champ `email` de l'item courant. `{{ $('Webhook').item.json.body.amount }}` accède à une donnée d'un node spécifique. Les expressions supportent aussi le JavaScript inline : `{{ $json.price * 1.2 }}` pour ajouter 20% de TVA. C'est le ciment qui connecte les nodes entre eux.
+</KeyConcept>
+
+<Example brand="n8n">
+Imagine un workflow qui enrichit des leads. Le webhook reçoit un email. Un node HTTP Request appelle l'API Clearbit pour obtenir le nom de l'entreprise et le poste. Un node Set combine l'email original avec les données Clearbit. Un node Code formate le nom en "Prénom NOM" et calcule un lead score. En 4 nodes, tu as transformé un simple email en un lead enrichi prêt à être envoyé dans ton CRM.
+</Example>
+
+</Layer>
+
+<Layer id="connexions-api" order={4} title="Connexions API" subtitle="Appeler des services externes" icon="Plug">
+
+## Connecter le monde entier
+
+La puissance de n8n, c'est qu'il peut parler à **n'importe quel service** qui a une API. Pas juste les 400+ intégrations natives -- littéralement n'importe quelle API REST ou GraphQL via le node HTTP Request. C'est la couche qui transforme n8n en chef d'orchestre de tous tes outils.
+
+Les **credentials** sont la clé. Pour chaque service que tu connectes (Slack, Google Sheets, OpenAI, Supabase...), tu dois configurer une méthode d'authentification : API Key, OAuth2, Basic Auth, ou Header Auth. n8n stocke ces credentials de façon chiffrée et les injecte automatiquement dans les requêtes. Tu les configures une fois, tu les réutilises partout.
+
+Le node **HTTP Request** est le plus polyvalent. Il te permet d'appeler n'importe quelle API avec n'importe quelle méthode (GET, POST, PUT, DELETE), headers personnalisés, body JSON ou form-data, et pagination automatique. Quand un service n'a pas de node dédié dans n8n, le HTTP Request fait le job.
+
+<Analogy>
+Les connexions API, c'est comme un standard téléphonique des années 50. L'opératrice (n8n) a devant elle des dizaines de câbles (credentials) qui peuvent se brancher sur autant de lignes (services). "Passez-moi Google Sheets, ligne 3" (node Google Sheets). "Passez-moi l'API de ce service inconnu, en direct" (HTTP Request). L'opératrice gère les connexions et transmet les messages.
+</Analogy>
+
+<KeyConcept term="Credentials n8n">
+Les credentials sont les "clés d'accès" que n8n utilise pour s'authentifier auprès des services externes. Elles sont stockées chiffrées dans la base interne de n8n (SQLite ou PostgreSQL). Chaque type de service a son type de credential : API Key pour OpenAI, OAuth2 pour Google et Slack, Connection String pour les bases de données. Tu peux partager des credentials entre workflows sans les dupliquer.
+</KeyConcept>
+
+<Example brand="OpenAI">
+Tu veux résumer automatiquement les tickets de support. Le workflow : un trigger "New Ticket" depuis ton helpdesk, un node HTTP Request (ou le node OpenAI dédié) qui envoie le contenu du ticket à l'API GPT-4 avec le prompt "Résume ce ticket en 2 phrases", puis un node Slack qui poste le résumé dans un channel. Le credential OpenAI (ta clé API) est configuré une seule fois et réutilisé dans tous tes workflows qui appellent GPT.
+</Example>
+
+<Callout type="warning">
+Attention aux rate limits des APIs. Si ton workflow traite 1000 items et que chaque item appelle l'API OpenAI, tu risques de te faire bloquer (rate limit). Utilise le node "Split In Batches" pour traiter les items par lots avec un délai entre chaque lot, ou active l'option "Retry on Fail" avec un backoff exponentiel.
+</Callout>
+
+</Layer>
+
+<Layer id="conditions-branches" order={5} title="Conditions & Branches" subtitle="Logique if/else, switch" icon="GitBranch">
+
+## Les embranchements de ton automate
+
+Un workflow linéaire (A puis B puis C) est simple mais limité. Les conditions et branches permettent de créer de la **logique** : si la commande est supérieure à 100 euros, envoyer un email de remerciement VIP ; sinon, envoyer un email standard. C'est le if/else de tes workflows.
+
+Le node **IF** est le plus basique : il a deux sorties, "true" et "false". Tu définis une condition (`{{ $json.amount > 100 }}`) et les items sont routés vers la branche correspondante. Le node **Switch** va plus loin : il a plusieurs sorties, comme un aiguillage ferroviaire. "Si le pays est France, branche 1. Si Belgique, branche 2. Si Canada, branche 3. Sinon, branche par défaut."
+
+Le node **Filter** est une variante simplifiée : il laisse passer les items qui matchent la condition et élimine les autres. C'est un IF dont tu n'utilises que la branche "true". Très utile pour ne traiter que les items pertinents : filtrer les emails de spam, ne garder que les commandes payées, ignorer les événements de test.
+
+<Analogy>
+Les conditions, c'est un réseau de tapis roulants dans un centre de tri postal. Chaque colis (item) passe devant un scanner (condition). Selon le code postal, le colis est aiguillé vers le bon tapis : Paris à gauche, Lyon tout droit, Marseille à droite. Certains colis sont rejetés (filtrés) s'ils n'ont pas d'étiquette valide.
+</Analogy>
+
+<KeyConcept term="Branching (Embranchement)">
+Le branching dans n8n permet d'exécuter différentes séquences de nodes selon les données. Le node IF crée 2 branches (true/false), le Switch en crée N. Les branches peuvent se rejoindre avec un node Merge. Attention : les branches sont exécutées en parallèle par défaut, mais les nodes au sein d'une branche sont séquentiels. Les branches vides (sans node après) terminent simplement le chemin pour ces items.
+</KeyConcept>
+
+<Example brand="n8n">
+Tu automatises le onboarding des nouveaux clients. Le trigger reçoit les infos du client. Un node IF vérifie le plan choisi : si "Enterprise", le workflow crée un channel Slack dédié, assigne un account manager, et envoie un email personnalisé signé par le CEO. Si "Starter", il envoie un email automatique avec un lien vers la documentation. Un seul workflow, deux expériences client totalement différentes.
+</Example>
+
+<Callout type="tip">
+Nomme tes nodes IF et Switch avec des noms explicites : "Is VIP?", "Country Router", "Has Email?". Quand tu reviens sur un workflow 6 mois plus tard, "IF" ne te dit rien, mais "Is paid?" te dit immédiatement ce que fait le node. Clique sur le titre du node pour le renommer.
+</Callout>
+
+</Layer>
+
+<Layer id="noeuds-sortie" order={6} title="Noeuds de sortie" subtitle="Envoyer le résultat (email, BDD, webhook)" icon="Send">
+
+## Livrer le résultat au bon endroit
+
+Les nodes de sortie sont la finalité de ton workflow : ils **envoient** le résultat quelque part. Un email au client, un message Slack à l'équipe, une ligne dans Google Sheets, un record dans Supabase, un appel webhook vers un autre service. C'est la couche qui transforme le traitement interne en action visible dans le monde réel.
+
+Un workflow peut avoir **plusieurs** nodes de sortie. Un seul trigger peut déclencher un email au client ET une mise à jour de la base ET une notification Slack ET un log dans Google Sheets. Ces actions peuvent se faire en parallèle (branches) ou séquentiellement (chaîne).
+
+La sortie la plus critique est souvent la base de données. Mettre à jour un statut de commande dans Supabase, créer un nouveau contact dans ton CRM, logger un événement dans une table d'audit. Le node Supabase de n8n (ou un HTTP Request pointant vers l'API Supabase) gère les INSERT, UPDATE, UPSERT et DELETE directement depuis le workflow.
+
+<Analogy>
+Les nodes de sortie, c'est le bureau de poste à la fin de la chaîne de traitement. Les lettres (données transformées) ont été triées, tamponnées, vérifiées. Maintenant il faut les envoyer : certaines par courrier (email), d'autres par télégramme (webhook), d'autres dans des archives (base de données). Chaque destination a son propre processus d'expédition.
+</Analogy>
+
+<KeyConcept term="Upsert">
+L'upsert est une opération qui combine INSERT et UPDATE : si la ligne existe déjà (selon une clé unique), elle est mise à jour ; sinon, elle est créée. C'est extrêmement utile dans les workflows pour éviter les doublons. Au lieu de vérifier si un contact existe avant de le créer (2 opérations), un upsert fait les deux en une seule opération. Supabase et la plupart des bases supportent l'upsert nativement.
+</KeyConcept>
+
+<Example brand="n8n">
+Un workflow de veille concurrentielle tourne tous les jours. Il scrape les prix des concurrents (HTTP Request), les compare avec les prix de la veille (Supabase SELECT), et produit trois sorties en parallèle : (1) un node Supabase pour stocker les nouveaux prix (upsert), (2) un node Gmail qui envoie un rapport quotidien au directeur commercial, (3) un node Slack qui alerte le channel #pricing seulement si un concurrent a baissé ses prix de plus de 10% (après un node IF).
+</Example>
+
+</Layer>
+
+<Layer id="gestion-erreurs" order={7} title="Gestion d'erreurs" subtitle="Que faire quand ça plante" icon="AlertTriangle">
+
+## Parce que ça VA planter
+
+Un workflow sans gestion d'erreurs, c'est une bombe à retardement. L'API externe est down ? Le JSON reçu n'a pas le format attendu ? Le rate limit est dépassé ? Le token a expiré ? Chaque node est un point de défaillance potentiel. La question n'est pas SI ça va planter, mais QUAND.
+
+n8n offre plusieurs mécanismes. Le **Retry on Fail** sur chaque node permet de réessayer automatiquement en cas d'erreur (avec un délai exponentiel). Le **Error Trigger** est un workflow dédié qui se déclenche quand un autre workflow échoue -- idéal pour envoyer une alerte Slack ou un email. Le mode **Continue on Fail** permet au workflow de continuer même si un node échoue (utile quand un échec n'est pas critique).
+
+La technique la plus puissante est le **Error Workflow** : tu connectes un chemin d'erreur alternatif à un node. Si le node principal échoue, les données sont routées vers le chemin d'erreur au lieu de stopper le workflow. Tu peux y mettre de la logique de fallback : essayer une API alternative, stocker les données en attente pour retraitement, ou simplement logger l'erreur et continuer.
+
+<Analogy>
+La gestion d'erreurs, c'est comme le plan B d'un événement en plein air. Tu prévois le beau temps (cas normal), mais tu as aussi une tente de secours (fallback) au cas où il pleut. Et si la tente s'envole (erreur critique), tu as le numéro du restaurant d'à côté (alerte + plan C). Ne jamais organiser un événement sans plan de secours.
+</Analogy>
+
+<KeyConcept term="Error Workflow">
+L'Error Workflow dans n8n est un workflow séparé qui se déclenche automatiquement quand un workflow principal échoue. Il reçoit en entrée les détails de l'erreur : quel workflow a échoué, quel node, quel message d'erreur, et les données qui ont causé le problème. Tu le configures dans les settings du workflow principal. C'est la première chose à mettre en place sur tout workflow de production.
+</KeyConcept>
+
+<Example brand="n8n">
+Tu as un workflow critique qui synchronise les commandes Shopify vers ton ERP. Tu configures : (1) Retry on Fail avec 3 tentatives et backoff exponentiel sur le node HTTP Request qui appelle l'ERP. (2) Continue on Fail sur le node qui enrichit les données (pas critique). (3) Un Error Workflow qui envoie un message Slack avec le détail de l'erreur dans le channel #ops-alerts. (4) Un node "Dead Letter Queue" (une table Supabase) où sont stockées les commandes en échec pour retraitement manuel.
+</Example>
+
+<Callout type="warning">
+Ne laisse JAMAIS un workflow de production sans Error Workflow. Sans ça, quand un workflow échoue à 3h du matin, tu ne le sauras qu'en regardant les logs le lendemain -- pendant que des commandes se perdent, des emails ne partent pas, et des données disparaissent dans le vide.
+</Callout>
+
+</Layer>
+
+<Layer id="execution-logs" order={8} title="Exécution & Logs" subtitle="Suivi et historique" icon="ScrollText">
+
+## La boîte noire de tes automatisations
+
+Chaque exécution d'un workflow est enregistrée par n8n : quand elle a eu lieu, combien de temps elle a duré, si elle a réussi ou échoué, et les données qui ont circulé dans chaque node. C'est ton historique complet, ta boîte noire.
+
+Les logs d'exécution sont essentiels pour le **debug**. Quand un client dit "je n'ai pas reçu mon email de confirmation", tu ouvres l'historique d'exécution du workflow, tu trouves l'exécution correspondante, et tu vois exactement ce qui s'est passé à chaque étape : le trigger a bien reçu les données, le node de traitement a bien extrait l'email, mais le node Gmail a échoué avec "Rate limit exceeded". Problème identifié en 30 secondes.
+
+Au-delà du debug, les logs permettent le **monitoring**. Combien de workflows ont tourné aujourd'hui ? Quel est le taux d'échec ? Quel node échoue le plus souvent ? Quel workflow consomme le plus de temps d'exécution ? Ces métriques t'aident à maintenir tes automatisations en bonne santé.
+
+<Analogy>
+Les logs d'exécution, c'est la caméra de surveillance d'un entrepôt. Tu peux rembobiner et voir exactement ce qui s'est passé : quel colis est arrivé à quelle heure, par quel chemin il est passé, qui l'a traité, et où il est parti. Quand un colis se perd, tu regardes les enregistrements au lieu de deviner ce qui a mal tourné.
+</Analogy>
+
+<KeyConcept term="Execution History">
+L'historique d'exécution dans n8n conserve le détail complet de chaque run : timestamp, durée, statut (success/error/waiting), et les données d'entrée et sortie de chaque node. Par défaut, n8n garde les exécutions pendant un certain temps (configurable). En production, configure la rétention pour garder au moins 30 jours d'historique. Les exécutions en erreur devraient être gardées plus longtemps pour l'analyse.
+</KeyConcept>
+
+<Example brand="n8n">
+Dans n8n, clique sur "Executions" dans la barre latérale pour voir l'historique. Tu peux filtrer par workflow, par statut (success/error), et par période. Clique sur une exécution pour voir le workflow avec les données réelles de ce run. Tu peux même "Retry" une exécution échouée -- n8n relancera le workflow avec les mêmes données d'entrée. C'est ultra pratique pour retraiter des items après avoir corrigé un bug.
+</Example>
+
+<Callout type="tip">
+Ajoute un node "Set" de logging avant les étapes critiques de tes workflows. Il ne fait rien d'autre que passer les données, mais dans l'historique d'exécution, tu peux voir exactement l'état des données à ce point précis. C'est l'équivalent d'un `console.log` en JavaScript -- simple mais indispensable pour le debug.
+</Callout>
+
+</Layer>
+
+</LayerStack>

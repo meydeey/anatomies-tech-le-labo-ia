@@ -1,0 +1,183 @@
+<LayerStack>
+
+<Layer id="silicium-hardware" order={1} title="Silicium & Hardware" subtitle="Le serveur physique dans un datacenter" icon="Cpu">
+
+## La base physique de tout
+
+Quand tu achètes un VPS chez OVH, Hetzner ou DigitalOcean, tu ne loues pas une machine imaginaire. Il y a un vrai serveur physique, quelque part dans un datacenter, avec de vrais processeurs, de vraies barrettes de RAM et de vrais disques durs. Ce serveur est installé dans un rack métallique, dans une salle climatisée, avec des câbles réseau, une alimentation redondante et parfois même des générateurs diesel en backup.
+
+Le silicium, c'est le matériau de base des puces électroniques. Chaque processeur contient des milliards de transistors gravés dans du silicium. C'est littéralement du sable transformé en machine à calculer. Ces puces exécutent des milliards d'opérations par seconde, et c'est sur cette puissance brute que tout le reste repose.
+
+Un datacenter typique contient des milliers de ces serveurs, empilés dans des rangées de racks. La chaleur dégagée est énorme, d'où les systèmes de refroidissement sophistiqués. Si la clim tombe en panne, les serveurs peuvent griller en quelques minutes.
+
+<Analogy>
+Imagine un immense immeuble de bureaux. Chaque étage contient des centaines de bureaux (les serveurs). Chaque bureau a son propre ordinateur, sa connexion internet, et son système électrique. Le datacenter, c'est l'immeuble. Ton VPS, c'est un bureau que tu loues dans cet immeuble.
+</Analogy>
+
+<KeyConcept term="Datacenter">
+Un bâtiment sécurisé et climatisé qui héberge des milliers de serveurs physiques. Il dispose d'une alimentation électrique redondante, d'une connexion internet ultra-rapide, et de systèmes de sécurité physique (badges, caméras, biométrie). Les plus grands datacenters du monde appartiennent à Google, Amazon et Microsoft.
+</KeyConcept>
+
+<Example brand="OVH">
+OVH possède plus de 30 datacenters dans le monde, dont plusieurs à Roubaix et Strasbourg. Quand tu prends un VPS chez OVH, ton instance tourne physiquement sur un serveur Dell ou Supermicro installé dans l'un de ces centres. L'incendie de leur datacenter de Strasbourg en 2021 a montré à quel point le hardware physique reste la base fragile de tout le cloud.
+</Example>
+
+</Layer>
+
+<Layer id="hyperviseur" order={2} title="Hyperviseur" subtitle="Le logiciel qui découpe la machine en tranches" icon="Layers">
+
+## Le couteau qui tranche le gâteau
+
+Un serveur physique coûte cher. L'utiliser pour un seul client serait du gaspillage. L'hyperviseur est le logiciel magique qui permet de découper un seul serveur physique en plusieurs machines virtuelles indépendantes. Chaque VM croit qu'elle est seule au monde, avec son propre processeur, sa propre RAM et son propre disque.
+
+L'hyperviseur agit comme un arbitre entre toutes les VM. Il distribue les ressources du serveur physique de manière équitable. Si ta VM demande du CPU, l'hyperviseur vérifie que les autres VM ne sont pas en train de l'utiliser, puis te l'alloue. Tout ça se passe en quelques nanosecondes, de manière totalement transparente.
+
+Les deux hyperviseurs les plus utilisés sont KVM (open source, utilisé par la majorité des providers) et VMware (propriétaire, plus courant en entreprise). C'est grâce à cette technologie que le cloud computing existe : sans hyperviseur, pas de VPS, pas d'AWS, pas de cloud.
+
+<Analogy>
+L'hyperviseur, c'est comme un gérant d'immeuble qui transforme un grand loft en plusieurs appartements séparés. Chaque locataire a sa propre porte d'entrée, ses propres murs, son propre compteur électrique. Personne ne sait combien d'appartements il y a au total. Chacun vit comme s'il avait l'immeuble pour lui.
+</Analogy>
+
+<KeyConcept term="Hyperviseur">
+Un logiciel qui crée et gère des machines virtuelles sur un serveur physique. Il fait croire à chaque VM qu'elle dispose de son propre hardware dédié, alors qu'en réalité tout est partagé. Les principaux hyperviseurs sont KVM, VMware ESXi et Hyper-V (Microsoft).
+</KeyConcept>
+
+<Example brand="AWS">
+Amazon Web Services utilise un hyperviseur custom appelé Nitro, une version optimisée de KVM. Quand tu lances une instance EC2 sur AWS, l'hyperviseur Nitro crée ta VM sur un serveur physique dans l'un de leurs datacenters. La performance est si bien isolée que tu ne remarques jamais que des dizaines d'autres clients tournent sur la même machine physique.
+</Example>
+
+</Layer>
+
+<Layer id="machine-virtuelle" order={3} title="Machine Virtuelle" subtitle="Ta portion isolée du serveur" icon="Box">
+
+## Ton espace privé dans une machine partagée
+
+La machine virtuelle, c'est ce que tu obtiens concrètement quand tu achètes un VPS. C'est une simulation complète d'un ordinateur : elle a un processeur virtuel (vCPU), de la RAM allouée, un disque dur virtuel et une carte réseau virtuelle. Pour toi et pour les logiciels qui tournent dessus, c'est un vrai ordinateur à part entière.
+
+L'isolation est le point clé. Ta VM est complètement séparée des autres VM sur le même serveur physique. Si le voisin fait tourner un script qui consomme tout son CPU, ça n'affecte pas ta VM. Si sa VM est hackée, la tienne reste protégée. C'est comme si chaque VM vivait dans sa propre bulle.
+
+Quand tu choisis un VPS "2 vCPU, 4 Go RAM, 80 Go SSD", tu définis la taille de ta bulle. L'hyperviseur garantit que ces ressources te sont réservées. Tu peux redémarrer ta VM, la réinstaller, la casser complètement — ça n'affecte personne d'autre.
+
+<Analogy>
+Ta VM, c'est comme une chambre d'hôtel. Tu as ta clé, ton lit, ta salle de bain, ta télé. Tu fais ce que tu veux dans ta chambre. Mais l'hôtel existe : il y a d'autres chambres, un système de plomberie partagé, une réception commune. La VM te donne l'illusion d'être chez toi, tout en partageant l'infrastructure.
+</Analogy>
+
+<KeyConcept term="Machine Virtuelle (VM)">
+Un ordinateur simulé par logiciel qui fonctionne à l'intérieur d'un serveur physique. Elle possède ses propres ressources (CPU, RAM, disque) isolées des autres VM. C'est la brique de base du cloud computing. Un VPS est une VM qu'on te loue.
+</KeyConcept>
+
+<Example brand="DigitalOcean">
+Chez DigitalOcean, les VM s'appellent des "Droplets". Un Droplet à 6$/mois te donne 1 vCPU, 1 Go de RAM et 25 Go de SSD. C'est une VM complète sur laquelle tu peux installer Ubuntu, déployer n8n, héberger un site web, ou faire tourner un bot Discord. Tu la gères comme si c'était ton propre ordinateur, accessible de partout via internet.
+</Example>
+
+</Layer>
+
+<Layer id="systeme-exploitation" order={4} title="Système d'exploitation" subtitle="Linux qui tourne sur ta VM" icon="Monitor">
+
+## Le chef d'orchestre de ta machine
+
+Une VM sans système d'exploitation, c'est comme un ordinateur vide : ça ne sert à rien. Le système d'exploitation (OS) est le premier logiciel installé sur ta VM. C'est lui qui gère tout : les fichiers, les programmes, la mémoire, le réseau, les utilisateurs. Sur un VPS, c'est presque toujours Linux, car il est gratuit, léger et ultra-stable.
+
+Linux existe en plusieurs "distributions" (ou distros) : Ubuntu, Debian, CentOS, AlmaLinux... Chaque distro est comme une version personnalisée de Linux. Ubuntu est la plus populaire pour les débutants car elle a une grande communauté et beaucoup de tutoriels. Debian est réputée pour sa stabilité. Le noyau Linux reste le même, c'est l'emballage qui change.
+
+Quand tu crées un VPS, le provider te demande de choisir ton OS. En un clic, il installe la distribution sur ta VM. En 30 secondes, tu as un Linux prêt à l'emploi, avec un accès root (administrateur) pour tout configurer.
+
+<Analogy>
+Le système d'exploitation, c'est comme le système nerveux d'un corps humain. Il coordonne tous les organes (les programmes), gère l'énergie (le CPU et la RAM), et permet de communiquer avec l'extérieur (le réseau). Sans lui, le corps est juste un amas de cellules sans coordination.
+</Analogy>
+
+<KeyConcept term="Distribution Linux">
+Une version packagée de Linux qui inclut le noyau (kernel) plus un ensemble de logiciels préinstallés, un gestionnaire de paquets et une configuration par défaut. Ubuntu, Debian et CentOS sont les plus utilisées sur les serveurs. Chaque distro a son propre cycle de mises à jour et sa philosophie.
+</KeyConcept>
+
+<Example brand="Netflix">
+Netflix fait tourner la quasi-totalité de son infrastructure sur des VM Linux (distribution FreeBSD/Ubuntu) dans le cloud AWS. Chaque micro-service qui te recommande un film, qui gère ton abonnement ou qui streame la vidéo tourne sur une VM avec un Linux optimisé. C'est la preuve que Linux n'est pas un OS "pour geeks" mais la fondation du web mondial.
+</Example>
+
+<Callout type="tip">
+Si tu débutes, choisis Ubuntu 22.04 LTS (Long Term Support). Le "LTS" signifie que cette version recevra des mises à jour de sécurité pendant 5 ans. Pas besoin de la mettre à jour tous les 6 mois.
+</Callout>
+
+</Layer>
+
+<Layer id="reseau-ip" order={5} title="Réseau & IP" subtitle="L'adresse pour atteindre ta machine" icon="Network">
+
+## L'adresse postale de ta machine sur internet
+
+Ton VPS est connecté à internet grâce à une adresse IP publique. Cette adresse, c'est un numéro unique qui permet à n'importe qui dans le monde de trouver ta machine. Par exemple : `149.56.23.187`. Quand quelqu'un visite ton site web, son navigateur utilise cette adresse pour contacter ton VPS.
+
+L'adresse IP est attribuée par ton provider au moment de la création du VPS. Elle ne change jamais (c'est une IP "statique"), ce qui est essentiel pour héberger un site web ou un service. Si ton IP changeait à chaque redémarrage, personne ne pourrait trouver ta machine de manière fiable.
+
+En plus de l'IP publique, ton VPS a souvent un réseau privé qui lui permet de communiquer avec d'autres VPS du même provider sans passer par internet. C'est plus rapide et plus sécurisé. Par exemple, tu peux avoir un VPS pour ton application et un autre pour ta base de données, connectés par réseau privé.
+
+<Analogy>
+L'adresse IP, c'est exactement comme une adresse postale. "12 rue de la Paix, Paris" permet au facteur de te trouver parmi des millions de bâtiments. L'adresse IP permet à internet de trouver ton VPS parmi des milliards de machines connectées. Sans adresse, pas de courrier. Sans IP, pas de connexion.
+</Analogy>
+
+<KeyConcept term="Adresse IP publique">
+Un identifiant numérique unique attribué à ta machine sur internet (ex: 149.56.23.187 en IPv4, ou 2001:0db8::1 en IPv6). C'est grâce à cette adresse que les utilisateurs et les services peuvent contacter ton VPS. Une IP statique ne change pas, contrairement à une IP dynamique.
+</KeyConcept>
+
+<Example brand="Hetzner">
+Hetzner, un provider allemand très populaire pour son rapport qualité/prix, attribue une IPv4 et une IPv6 à chaque VPS. Ils proposent aussi des réseaux privés (vSwitch) qui permettent de connecter plusieurs VPS entre eux à 10 Gbit/s sans passer par internet. Parfait pour une architecture avec un serveur web + une base de données.
+</Example>
+
+</Layer>
+
+<Layer id="acces-ssh" order={6} title="Accès SSH" subtitle="La télécommande pour piloter ton VPS" icon="Terminal">
+
+## La porte d'entrée sécurisée vers ta machine
+
+SSH (Secure Shell) est le protocole qui te permet de te connecter à ton VPS depuis ton ordinateur. Tu ouvres un terminal, tu tapes `ssh root@149.56.23.187`, et boum : tu es à l'intérieur de ta machine distante. Tu peux taper des commandes comme si tu étais assis devant le serveur, sauf que le serveur est peut-être à 5000 km de toi.
+
+La connexion SSH est chiffrée de bout en bout. Tout ce que tu tapes et tout ce que le serveur te renvoie est crypté. Même si quelqu'un intercepte le trafic, il ne verra que du charabia illisible. C'est pour ça que SSH a remplacé Telnet, l'ancien protocole qui envoyait tout en clair (y compris les mots de passe).
+
+L'authentification SSH peut se faire de deux manières : par mot de passe (simple mais moins sécurisé) ou par clé SSH (une paire de clés cryptographiques). La clé SSH est la méthode recommandée. Tu génères une paire de clés sur ton ordinateur, tu déposes la clé publique sur le serveur, et ensuite tu peux te connecter sans mot de passe, de manière ultra-sécurisée.
+
+<Analogy>
+SSH, c'est comme une télécommande universelle ultra-sécurisée pour ton serveur. Imagine que tu puisses ouvrir ta porte d'entrée, allumer la lumière, régler le chauffage et cuisiner, tout depuis ton téléphone à distance. SSH fait pareil avec ton VPS : tu peux tout contrôler depuis n'importe où, et la connexion est protégée comme un coffre-fort.
+</Analogy>
+
+<KeyConcept term="Clé SSH">
+Un système d'authentification basé sur la cryptographie asymétrique. Tu génères deux fichiers : une clé privée (que tu gardes secrète sur ton PC) et une clé publique (que tu déposes sur le serveur). Quand tu te connectes, SSH vérifie que ta clé privée correspond à la clé publique. C'est plus sécurisé qu'un mot de passe et impossible à deviner par force brute.
+</KeyConcept>
+
+<Example brand="GitHub">
+GitHub utilise exactement le même système de clés SSH pour authentifier les développeurs qui font des git push. Quand tu ajoutes ta clé SSH publique dans les paramètres de ton compte GitHub, tu peux ensuite pousser du code sans taper de mot de passe. Le même mécanisme protège l'accès à ton VPS.
+</Example>
+
+<Callout type="warning">
+Ne te connecte jamais en tant que root avec un mot de passe sur un VPS exposé à internet. Les bots scannent en permanence toutes les IPs et tentent des millions de combinaisons de mots de passe. Désactive l'authentification par mot de passe et utilise uniquement des clés SSH.
+</Callout>
+
+</Layer>
+
+<Layer id="applications" order={7} title="Applications" subtitle="Ce que tu fais tourner dessus" icon="AppWindow">
+
+## La raison d'être de tout le reste
+
+Tout ce qu'on a vu jusqu'ici (hardware, hyperviseur, VM, OS, réseau, SSH) n'existe que pour une seule raison : faire tourner des applications. C'est la couche que tes utilisateurs voient et utilisent. Un site web, une API, un bot Discord, une instance n8n, un serveur Minecraft, un VPN, une base de données — tout ça, ce sont des applications qui tournent sur ton VPS.
+
+Pour installer une application, tu te connectes en SSH, tu utilises le gestionnaire de paquets de Linux (apt pour Ubuntu/Debian, yum pour CentOS), et tu installes ce dont tu as besoin. Par exemple : `apt install nginx` pour installer un serveur web, `apt install docker.io` pour Docker, ou tu peux déployer n8n avec Docker Compose en quelques minutes.
+
+La beauté d'un VPS, c'est la liberté totale. Contrairement à un hébergement mutualisé où tu es limité, sur un VPS tu as les droits root. Tu peux installer ce que tu veux, configurer comme tu veux, ouvrir les ports que tu veux. Avec cette liberté vient la responsabilité : c'est à toi de sécuriser, mettre à jour et maintenir tout ce que tu installes.
+
+<Analogy>
+Les couches 1 à 6, c'étaient les fondations, les murs, l'électricité et la plomberie de ta maison. La couche 7 (les applications), c'est le mobilier, la déco, la cuisine équipée — bref, ce qui rend la maison habitable et utile. Personne n'achète une maison pour ses fondations. On l'achète pour y vivre.
+</Analogy>
+
+<KeyConcept term="Port">
+Un numéro (de 0 à 65535) qui identifie un service spécifique sur ta machine. Le port 80, c'est le HTTP. Le port 443, c'est le HTTPS. Le port 22, c'est SSH. Le port 5678, c'est n8n. Quand tu accèdes à ton-ip:5678, tu demandes au serveur de te connecter au service qui écoute sur le port 5678.
+</KeyConcept>
+
+<Example brand="Supabase">
+Tu peux auto-héberger Supabase sur ton VPS avec Docker Compose. En quelques commandes, tu as une instance complète avec PostgreSQL, l'API REST automatique, l'authentification, le stockage de fichiers et le dashboard d'administration. C'est exactement la même stack que le Supabase cloud, mais sur TON serveur, avec TES données, à une fraction du coût.
+</Example>
+
+<Callout type="tip">
+Pour un vibecoder qui débute, la combinaison gagnante sur un VPS est : Docker + Docker Compose. Ça te permet d'installer n'importe quelle application (n8n, Supabase, WordPress, Plausible Analytics...) en copiant-collant un fichier docker-compose.yml sans te prendre la tête avec les dépendances.
+</Callout>
+
+</Layer>
+
+</LayerStack>

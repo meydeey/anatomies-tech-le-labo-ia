@@ -1,0 +1,215 @@
+<LayerStack>
+
+<Layer id="adresse-ip" order={1} title="Adresse IP" subtitle="L'adresse numerique reelle" icon="Hash">
+
+## Le vrai nom des machines
+
+Chaque machine connectee a Internet possede une **adresse IP** — une serie de chiffres qui l'identifie de maniere unique sur le reseau. En IPv4 (la version encore dominante), ca ressemble a `142.250.179.110`. En IPv6 (la version moderne), c'est plus long : `2607:f8b0:4004:800::200e`.
+
+C'est cette adresse que les machines utilisent pour se parler. Quand ton navigateur contacte un serveur, il utilise toujours une IP — jamais un nom de domaine. L'IP est l'adresse reelle, le nom de domaine est juste un raccourci pour les humains.
+
+Tu pourrais techniquement acceder a n'importe quel site en tapant son IP directement. Essaie `142.250.179.110` dans ton navigateur — tu arriveras sur Google. Mais personne ne fait ca, parce que retenir des dizaines d'adresses IP est tout simplement impossible pour un cerveau humain.
+
+<Analogy>
+L'adresse IP, c'est les coordonnees GPS d'un lieu. 48.8584° N, 2.2945° E te mene exactement a la Tour Eiffel. Mais personne ne dit "retrouve-moi a 48.8584 nord, 2.2945 est". On dit "retrouve-moi a la Tour Eiffel". Le nom de domaine, c'est "la Tour Eiffel" — le GPS (le DNS) se charge de convertir en coordonnees.
+</Analogy>
+
+<KeyConcept term="Adresse IP">
+Une adresse IP (Internet Protocol) est un identifiant numerique unique attribue a chaque appareil connecte a un reseau. En IPv4, c'est 4 nombres de 0 a 255 separes par des points (ex: 192.168.1.1). IPv6 utilise un format hexadecimal plus long pour supporter les milliards d'appareils connectes. C'est l'adresse reelle qu'utilisent les machines pour communiquer.
+</KeyConcept>
+
+<Example brand="Google">
+Google possede des milliers d'adresses IP pour ses differents services. `142.250.179.110` est une des IPs de `google.com`, mais `youtube.com`, `gmail.com`, `drive.google.com` ont chacun leurs propres adresses IP. Sans les noms de domaine, il faudrait retenir une IP differente pour chaque service Google que tu utilises.
+</Example>
+
+</Layer>
+
+<Layer id="besoin-nom-lisible" order={2} title="Besoin d'un nom lisible" subtitle="Pourquoi les humains ont besoin de noms" icon="User">
+
+## Le cerveau humain a besoin de mots
+
+Les ordinateurs adorent les chiffres. Les humains adorent les mots. C'est aussi simple que ca. Le systeme de noms de domaine existe parce que notre cerveau est cable pour retenir des mots, pas des sequences de chiffres.
+
+Imagine un monde sans noms de domaine. Pour aller sur Netflix, tu taperais `54.237.226.164`. Pour Google, `142.250.179.110`. Pour ton site de banque, une autre IP. Et si le serveur change d'IP (ce qui arrive regulierement), il faudrait mettre a jour ta memoire. C'est intenable.
+
+Les noms de domaine resolvent ce probleme elegamment : tu retiens un nom (`netflix.com`), et le systeme se charge de le traduire en IP. Si Netflix change de serveur, ils mettent a jour l'enregistrement DNS — ton navigateur ne voit aucune difference. Le nom reste le meme, seul l'IP change en coulisse.
+
+<Analogy>
+C'est comme les contacts de ton telephone. Tu ne retiens pas le numero de portable de chaque ami — tu retiens son nom. Quand tu veux appeler Marie, tu cherches "Marie" dans tes contacts, pas "06 12 34 56 78". Et si Marie change de numero, tu mets a jour son contact sans changer son nom. Le nom de domaine, c'est exactement ce systeme de contacts, mais pour Internet.
+</Analogy>
+
+<KeyConcept term="DNS (Domain Name System)">
+Le DNS est le systeme qui fait le lien entre les noms de domaine (lisibles par les humains) et les adresses IP (utilisees par les machines). Cree en 1983, il est souvent appele "l'annuaire telephonique d'Internet". Sans lui, il faudrait connaitre l'adresse IP de chaque serveur pour naviguer sur le web.
+</KeyConcept>
+
+<Example brand="Amazon">
+Amazon possede `amazon.com`, `amazon.fr`, `amazon.de`, `amazon.co.jp`... Chaque version locale a un nom de domaine different, facile a retenir. Derriere, ces domaines pointent vers des centaines de serveurs repartis dans le monde. L'utilisateur ne voit que le nom — le DNS gere toute la complexite de routage en arriere-plan.
+</Example>
+
+</Layer>
+
+<Layer id="structure-nom" order={3} title="Structure du nom" subtitle="sous-domaine.domaine.TLD" icon="Layers">
+
+## Anatomie d'un nom de domaine
+
+Un nom de domaine se lit de droite a gauche et se decompose en plusieurs parties separees par des points. Prenons `blog.monsite.com` : `.com` est le **TLD** (Top Level Domain), `monsite` est le **domaine** (ou SLD, Second Level Domain), et `blog` est un **sous-domaine**.
+
+Le TLD est la partie la plus a droite. Il existe des centaines de TLD : les generiques (.com, .org, .net), les geographiques (.fr, .uk, .de), et les nouveaux (.io, .dev, .app, .ai). Le choix du TLD influence la perception : `.com` fait serieux et international, `.io` fait tech et startup, `.fr` fait local et francais.
+
+Le domaine est la partie que tu choisis et achetes. C'est ton identite unique sous ce TLD. Les sous-domaines sont gratuits et illimites — tu peux en creer autant que tu veux sans rien payer de plus. `api.monsite.com`, `app.monsite.com`, `staging.monsite.com` sont tous des sous-domaines de `monsite.com`.
+
+<Analogy>
+La structure d'un nom de domaine, c'est comme une adresse postale inversee. `blog.monsite.com` se lit comme : pays = `.com`, ville = `monsite`, rue = `blog`. Le TLD, c'est le pays (la zone la plus large). Le domaine, c'est la ville (ton identite). Le sous-domaine, c'est la rue ou le batiment specifique. Tu peux avoir autant de rues que tu veux dans ta ville.
+</Analogy>
+
+<KeyConcept term="Sous-domaine">
+Un sous-domaine est un prefixe ajoute devant un nom de domaine, separe par un point. `www`, `blog`, `api`, `app`, `mail` sont des sous-domaines courants. Ils permettent d'organiser differents services sous un meme domaine. `www.google.com`, `mail.google.com`, `maps.google.com` sont trois sous-domaines de `google.com`. Chaque sous-domaine peut pointer vers un serveur different.
+</KeyConcept>
+
+<Example brand="Google">
+Google utilise massivement les sous-domaines pour organiser ses services. `mail.google.com` = Gmail. `docs.google.com` = Google Docs. `drive.google.com` = Google Drive. `maps.google.com` = Google Maps. `cloud.google.com` = Google Cloud. Chaque sous-domaine pointe vers une infrastructure differente, mais ils vivent tous sous le domaine `google.com`.
+</Example>
+
+<Callout type="tip">
+Quand tu deploies un projet sur Vercel, tu obtiens automatiquement un sous-domaine gratuit : `monprojet.vercel.app`. C'est un sous-domaine de `vercel.app`. Tu peux ensuite connecter ton propre domaine personnalise si tu en as achete un.
+</Callout>
+
+</Layer>
+
+<Layer id="registrar-domaine" order={4} title="Registrar" subtitle="Le bureau d'enregistrement" icon="Store">
+
+## Acheter ton domaine
+
+Pour posseder un nom de domaine, tu passes par un **registrar** — un revendeur accredite. Les plus connus sont OVH (tres populaire en France), Namecheap, Cloudflare Registrar, GoDaddy, ou Gandi. C'est comme choisir un operateur telecom : le reseau est le meme, mais les prix et le service client varient.
+
+Le processus d'achat est simple : tu cherches si le nom est disponible, tu le reserves, tu paies l'abonnement annuel (generalement 10 a 15 euros pour un `.com`), et le domaine est a toi. "A toi" est un raccourci — tu le loues en fait. Si tu ne renouvelles pas, le domaine redevient disponible apres une periode de grace.
+
+Attention au piege des frais caches. Certains registrars affichent un prix attractif la premiere annee (1 euro !) puis augmentent drastiquement au renouvellement (20 euros). Cloudflare Registrar est transparent : prix coutant, sans marge, sans surprise. C'est devenu le choix favori des developpeurs.
+
+<Analogy>
+Le registrar, c'est comme l'operateur qui te vend ton numero de telephone. Tu choisis ton numero (le domaine), tu paies un abonnement mensuel ou annuel, et le numero est a toi tant que tu paies. Si tu arretes, apres un delai, le numero est recycle et quelqu'un d'autre peut le prendre.
+</Analogy>
+
+<KeyConcept term="Enregistrement de domaine">
+L'enregistrement d'un nom de domaine est le processus par lequel tu reserves un nom unique aupres d'un registrar accredite. Le registrar l'inscrit dans le registre du TLD correspondant (Verisign pour .com, AFNIC pour .fr). L'enregistrement est valable de 1 a 10 ans selon ce que tu paies, et doit etre renouvele pour rester actif.
+</KeyConcept>
+
+<Example brand="OVH">
+OVH est le registrar le plus utilise en France. Ils gerent plus de 4 millions de noms de domaine. En plus de la vente de domaines, ils proposent un hebergement web, un DNS integre et des certificats SSL gratuits. C'est souvent le premier choix pour un francophone qui debute, parce que l'interface et le support sont en francais.
+</Example>
+
+<Callout type="warning">
+Avant d'acheter un domaine, verifie qu'il n'a pas un passe douteux. Certains domaines anciens ont ete utilises pour du spam ou du phishing et sont blacklistes par les moteurs de recherche. Un outil comme `web.archive.org` te montre l'historique d'un domaine.
+</Callout>
+
+</Layer>
+
+<Layer id="whois" order={5} title="WHOIS" subtitle="L'annuaire des proprietaires" icon="Search">
+
+## Qui possede ce domaine ?
+
+Chaque nom de domaine enregistre est associe a des informations publiques : le nom du proprietaire, son adresse, son email, la date d'enregistrement, la date d'expiration, et les serveurs DNS utilises. Ces informations sont accessibles via le protocole **WHOIS**, une sorte d'annuaire public des noms de domaine.
+
+N'importe qui peut faire une requete WHOIS sur n'importe quel domaine. Tape `whois google.com` dans un terminal ou utilise un site comme `who.is` — tu verras les informations d'enregistrement. C'est un systeme de transparence cree aux debuts d'Internet.
+
+Mais la transparence a un prix : ta vie privee. Si tu enregistres un domaine a ton nom, tes coordonnees sont publiques. C'est pour ca que la plupart des registrars proposent une **protection WHOIS** (souvent appelee "WHOIS privacy" ou "domain privacy"). Elle remplace tes informations personnelles par celles d'un service proxy, tout en gardant le domaine a ton nom.
+
+<Analogy>
+WHOIS, c'est le cadastre d'Internet. Comme le cadastre te permet de savoir qui possede un terrain ou un batiment, WHOIS te permet de savoir qui possede un nom de domaine. Sauf qu'ici, la consultation est gratuite et accessible a tous. La protection WHOIS, c'est comme utiliser une societe civile immobiliere (SCI) pour cacher le vrai proprietaire dans le cadastre.
+</Analogy>
+
+<KeyConcept term="WHOIS">
+WHOIS est un protocole et une base de donnees publique qui contient les informations d'enregistrement de chaque nom de domaine : proprietaire, contact technique, contact administratif, registrar utilise, serveurs DNS, dates de creation et d'expiration. C'est un outil essentiel pour verifier la legitimite d'un domaine ou retrouver le proprietaire d'un site.
+</KeyConcept>
+
+<Example brand="Tesla">
+Une requete WHOIS sur `tesla.com` revele que le domaine est enregistre depuis 2003, utilise les serveurs DNS de Cloudflare (`edna.ns.cloudflare.com`), et est gere par MarkMonitor — un service premium de protection de marque. Les grandes entreprises utilisent des registrars specialises pour proteger leurs domaines contre le vol et la fraude.
+</Example>
+
+</Layer>
+
+<Layer id="config-dns" order={6} title="Configuration DNS" subtitle="Pointer le nom vers une IP" icon="Settings">
+
+## Brancher le nom sur le serveur
+
+Avoir un nom de domaine ne suffit pas. Il faut le **configurer** pour qu'il pointe vers ton serveur, ton hebergement, ou ton service. C'est la qu'on ajoute les fameux enregistrements DNS dans le panneau de controle de ton registrar ou de ton service DNS.
+
+L'operation la plus courante est de creer un enregistrement **A** qui associe ton domaine a l'IP de ton serveur. Par exemple : `monsite.com -> 93.184.216.34`. Pour les services modernes (Vercel, Netlify, Heroku), tu crees plutot un **CNAME** qui pointe vers leur domaine : `www.monsite.com -> cname.vercel-dns.com`.
+
+Tu peux aussi configurer tes emails (enregistrements **MX**), prouver que tu possedes le domaine (enregistrements **TXT** pour Google, Stripe, etc.), et creer des sous-domaines pour differents services (`api.monsite.com`, `app.monsite.com`).
+
+<Analogy>
+Configurer le DNS, c'est comme configurer le transfert de courrier a La Poste. Tu as une nouvelle adresse (le domaine), mais le courrier ne va pas se rediriger tout seul. Tu dois aller a La Poste et dire : "tout le courrier pour cette adresse doit etre livre a tel endroit". Les enregistrements DNS, c'est exactement ces instructions de redirection.
+</Analogy>
+
+<KeyConcept term="Enregistrement CNAME">
+Un enregistrement CNAME (Canonical Name) cree un alias : il fait pointer un nom de domaine vers un autre nom de domaine (pas vers une IP). Par exemple, `www.monsite.com -> monsite.com` ou `blog.monsite.com -> monblog.wordpress.com`. C'est le type d'enregistrement le plus utilise avec les services cloud modernes (Vercel, Netlify, Heroku) qui n'ont pas d'IP fixe.
+</KeyConcept>
+
+<Example brand="Vercel">
+Pour connecter ton domaine personnalise a un projet Vercel, tu dois ajouter deux enregistrements DNS : un enregistrement A qui pointe `monsite.com` vers `76.76.21.21` (l'IP de Vercel), et un enregistrement CNAME qui pointe `www.monsite.com` vers `cname.vercel-dns.com`. Vercel detecte automatiquement ces enregistrements et genere un certificat SSL gratuit pour ton domaine.
+</Example>
+
+<Callout type="tip">
+Si tu utilises Cloudflare comme DNS (meme si ton domaine est achete ailleurs), tu beneficies de leur proxy qui cache l'IP reelle de ton serveur, ajoute un CDN gratuit et une protection DDoS. Il suffit de changer les serveurs DNS chez ton registrar pour pointer vers ceux de Cloudflare.
+</Callout>
+
+</Layer>
+
+<Layer id="propagation" order={7} title="Propagation" subtitle="Le temps que l'info se repande" icon="Timer">
+
+## L'attente apres le changement
+
+Tu as modifie un enregistrement DNS. Tu rafraichis ton site... et rien n'a change. Pas de panique — c'est la **propagation DNS**. Le changement est bien effectif sur ton serveur DNS autoritaire, mais tous les caches intermediaires dans le monde gardent encore l'ancienne valeur.
+
+La propagation DNS peut prendre de quelques minutes a 48 heures, selon le TTL (Time To Live) configure sur tes anciens enregistrements. Si le TTL etait de 3600 secondes (1 heure), les caches expirent en 1 heure maximum. Si le TTL etait de 86400 secondes (24 heures), ca peut prendre jusqu'a un jour.
+
+C'est une des frustrations les plus classiques du web. Tu changes ton DNS, tu ne vois rien, tu te demandes si tu as fait une erreur. Patience — ou utilise un outil comme `dnschecker.org` pour verifier la propagation en temps reel a travers le monde.
+
+<Analogy>
+La propagation DNS, c'est comme un changement d'adresse dans l'annuaire papier. Tu as prevenu l'editeur (le serveur autoritaire), mais toutes les copies deja imprimees et distribuees (les caches) gardent l'ancienne adresse. Il faut attendre que chaque copie arrive en fin de vie et soit remplacee par la nouvelle edition. C'est pas instantane.
+</Analogy>
+
+<KeyConcept term="Propagation DNS">
+La propagation DNS est le temps necessaire pour qu'un changement d'enregistrement DNS soit visible partout dans le monde. Ce delai est cause par les caches DNS a tous les niveaux (navigateur, OS, resolver du FAI, serveurs intermediaires). Chaque cache garde l'ancienne valeur jusqu'a l'expiration de son TTL. La propagation complete prend typiquement de 5 minutes a 48 heures.
+</KeyConcept>
+
+<Example brand="Shopify">
+Quand tu migres ta boutique vers Shopify et que tu changes tes DNS pour pointer vers Shopify, la documentation officielle previent : "La propagation peut prendre jusqu'a 48 heures." En pratique, avec un TTL court, ca prend souvent moins d'une heure. Mais pendant la propagation, certains visiteurs voient l'ancien site et d'autres le nouveau — selon le cache de leur resolver DNS.
+</Example>
+
+<Callout type="tip">
+Astuce de pro : avant une migration, baisse le TTL de tes enregistrements a 300 secondes (5 minutes) quelques jours a l'avance. Comme ca, au moment du changement, les caches expirent en 5 minutes au lieu de 24 heures. Apres la migration, tu peux remonter le TTL.
+</Callout>
+
+</Layer>
+
+<Layer id="nom-en-action" order={8} title="Le nom en action" subtitle="Taper l'URL et arriver sur le site" icon="Globe">
+
+## La magie en action
+
+Maintenant, assemblons tout. Tu tapes `monsite.com` dans ton navigateur et tu appuies sur Entree. En quelques millisecondes, voila ce qui se passe : ton navigateur demande au resolver DNS de traduire `monsite.com` en IP. Le resolver verifie son cache, interroge eventuellement la hierarchie DNS, et renvoie l'IP. Le navigateur se connecte au serveur a cette IP, charge la page, et l'affiche.
+
+Tout ca est invisible. Pour toi, tu as tape un nom et un site est apparu. Mais maintenant tu sais ce qui se passe en coulisse : un systeme hierarchique de serveurs, des caches a plusieurs niveaux, des enregistrements DNS, un registrar, un TLD, un serveur autoritaire — tout un ecosysteme qui fonctionne en harmonie pour que `monsite.com` affiche ta page.
+
+Et c'est pour ca que le nom de domaine est si puissant : il abstrait toute cette complexite. Ton client, ton utilisateur, ta grand-mere — personne n'a besoin de comprendre les IP, le DNS ou les TLD. Ils tapent un nom, ils arrivent sur ton site. C'est tout.
+
+<Analogy>
+Le nom de domaine en action, c'est comme un numero vert (0800). L'appelant compose un numero simple et memorable. Derriere, un systeme de routage intelligent dirige l'appel vers le bon centre d'appels, dans la bonne region, sur le bon poste. L'appelant ne sait rien de tout ca — il a juste compose un numero et quelqu'un a repondu.
+</Analogy>
+
+<KeyConcept term="Resolution de bout en bout">
+La resolution de bout en bout d'un nom de domaine englobe tout le parcours : saisie du nom dans le navigateur, requete au resolver DNS, traversee eventuelle de la hierarchie (racine, TLD, autoritaire), obtention de l'IP, connexion au serveur, chargement de la page. Ce processus complet prend typiquement entre 50ms et 3 secondes et se produit des milliards de fois par jour a travers le monde.
+</KeyConcept>
+
+<Example brand="Uber">
+Quand tu ouvres l'app Uber, elle contacte `api.uber.com`. Ce nom de domaine est resolu vers une IP proche de ta localisation grace au GeoDNS. La connexion est etablie en quelques millisecondes. Tu ne sais pas si le serveur est a Paris, Amsterdam ou Francfort — et tu n'en as pas besoin. Le nom de domaine + le DNS gerent tout ca pour que l'experience soit fluide, ou que tu sois dans le monde.
+</Example>
+
+<Callout type="info">
+En tant que vibecoder, le nom de domaine est souvent la premiere chose que tu configures pour un projet. Comprendre sa structure et son fonctionnement te fait gagner un temps enorme quand quelque chose ne marche pas : tu sais ou verifier (les enregistrements DNS), quoi attendre (la propagation), et comment debugger (dig, nslookup, dnschecker.org).
+</Callout>
+
+</Layer>
+
+</LayerStack>

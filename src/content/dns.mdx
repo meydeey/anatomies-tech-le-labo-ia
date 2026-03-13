@@ -1,0 +1,207 @@
+<LayerStack>
+
+<Layer id="nom-domaine-achete" order={1} title="Nom de domaine achete" subtitle="Le nom lisible (monsite.com)" icon="Tag">
+
+## Un nom pour exister sur Internet
+
+Tout commence par un nom. Tu veux que les gens puissent te trouver sur Internet avec quelque chose de memorable — `monsite.com`, `maboutique.fr`, `monapp.io`. Ce nom de domaine est l'equivalent de l'enseigne de ton magasin. C'est la premiere chose que les gens voient et tapent.
+
+Un nom de domaine est compose de deux parties : le **nom** (la partie que tu choisis, comme "netflix" ou "google") et l'**extension** ou TLD (Top Level Domain) comme `.com`, `.fr`, `.io`, `.dev`. Certaines extensions sont generiques (.com, .org, .net), d'autres sont geographiques (.fr, .de, .uk), et d'autres sont thematiques (.io pour la tech, .dev pour les developpeurs).
+
+Acheter un nom de domaine, c'est en fait le louer. Tu paies un abonnement annuel (generalement entre 10 et 50 euros) pour avoir le droit exclusif d'utiliser ce nom. Si tu arretes de payer, quelqu'un d'autre peut le recuperer.
+
+<Analogy>
+Un nom de domaine, c'est ton adresse postale sur Internet. Tout comme tu donnes ton adresse pour recevoir du courrier, tu donnes ton nom de domaine pour que les gens trouvent ton site. Sans adresse, ton site existe quelque part (a une IP), mais personne ne sait comment y aller.
+</Analogy>
+
+<KeyConcept term="Nom de domaine">
+Un nom de domaine est un identifiant unique et lisible par l'humain qui pointe vers une ou plusieurs adresses IP sur Internet. Il remplace les adresses numeriques (comme 142.250.179.110) par des noms memorisables (comme google.com). C'est le systeme DNS qui se charge de faire la traduction.
+</KeyConcept>
+
+<Example brand="Nike">
+Nike possede `nike.com` — un des noms de domaine les plus reconnus au monde. Ils ont aussi achete des dizaines de variantes : `nike.fr`, `nike.co.uk`, `nike.de` pour chaque pays, ainsi que des protections comme `n1ke.com` pour eviter le phishing. Un nom de domaine premium comme `nike.com` vaut des millions, mais le renouvellement annuel reste le meme tarif que pour tout le monde.
+</Example>
+
+</Layer>
+
+<Layer id="registrar" order={2} title="Registrar" subtitle="Le vendeur de noms (OVH, Namecheap)" icon="Store">
+
+## Le bureau d'enregistrement
+
+Tu ne peux pas "inventer" un nom de domaine comme ca. Il faut passer par un **registrar** — une entreprise accreditee qui a le droit de vendre et d'enregistrer des noms de domaine. Les registrars les plus connus sont OVH, Namecheap, Google Domains (devenu Squarespace Domains), GoDaddy, ou Cloudflare Registrar.
+
+Le registrar fait l'intermediaire entre toi et les registres mondiaux qui gerent les extensions. Quand tu achetes `monsite.com`, le registrar enregistre ton nom aupres du registre du `.com` (gere par Verisign). Il stocke aussi les serveurs DNS que tu veux utiliser et tes informations de contact.
+
+Tous les registrars vendent les memes noms de domaine (c'est un marche ouvert), mais les prix et services varient. Certains offrent la protection WHOIS, un DNS integre, des certificats SSL gratuits, ou une interface plus intuitive. Tu peux aussi transferer un domaine d'un registrar a un autre si tu n'es pas satisfait.
+
+<Analogy>
+Le registrar, c'est l'agence immobiliere d'Internet. Tu ne construis pas ta maison (ton site) directement sur un terrain (une IP). Tu passes d'abord par l'agence (le registrar) pour reserver ton adresse officielle (le domaine). L'agence l'enregistre au cadastre (le registre mondial) et s'assure que personne d'autre ne prend la meme adresse.
+</Analogy>
+
+<KeyConcept term="Registrar">
+Un registrar (bureau d'enregistrement) est une entreprise accreditee par l'ICANN (l'autorite mondiale des noms de domaine) pour vendre et gerer les noms de domaine. Il fait l'intermediaire entre toi et les registres qui gerent chaque extension (.com, .fr, .io). Tu passes obligatoirement par un registrar pour obtenir un nom de domaine.
+</KeyConcept>
+
+<Example brand="Cloudflare">
+Cloudflare Registrar a une particularite unique : ils vendent les noms de domaine **au prix coutant**, sans marge. Un `.com` coute environ 10 dollars/an chez eux, contre 15-20 chez d'autres registrars. En plus, leur interface est deja integree avec leur CDN et leur DNS, ce qui simplifie enormement la configuration pour les developpeurs.
+</Example>
+
+</Layer>
+
+<Layer id="serveurs-dns-racine" order={3} title="Serveurs DNS racine" subtitle="L'annuaire mondial" icon="Globe">
+
+## Le sommet de la hierarchie
+
+Quand ton navigateur veut transformer `netflix.com` en adresse IP, la recherche commence tout en haut : les **serveurs DNS racine**. Il en existe exactement 13 groupes dans le monde (nommes de A a M), operes par des organisations comme la NASA, l'US Army, Verisign, ou l'ICANN.
+
+Ces 13 serveurs ne connaissent pas directement l'adresse IP de `netflix.com`. Leur role est plus simple : ils savent qui gere chaque extension. Tu demandes `netflix.com` ? Le serveur racine te dit "pour le `.com`, va voir les serveurs TLD de Verisign a telle adresse". C'est un systeme d'aiguillage.
+
+En pratique, les serveurs racine ne sont pas 13 machines physiques — chaque "serveur" est replique sur des centaines de machines reparties partout dans le monde via anycast. Il y a plus de 1 500 instances physiques au total. Ce systeme est la fondation d'Internet : s'il tombait, plus aucun nom de domaine ne fonctionnerait.
+
+<Analogy>
+Les serveurs racine, c'est le standard telephonique principal d'un pays. Tu appelles et tu dis "je cherche un restaurant a Paris". L'operateur ne connait pas le numero du restaurant, mais il sait que pour Paris, il faut appeler le standard regional d'Ile-de-France. Il te transfere. C'est un aiguillage, pas une reponse directe.
+</Analogy>
+
+<KeyConcept term="Serveurs DNS racine (Root Servers)">
+Les serveurs DNS racine sont les 13 groupes de serveurs au sommet de la hierarchie DNS. Ils ne connaissent pas les adresses IP de chaque site, mais ils savent quels serveurs gerent chaque extension (.com, .fr, .org). C'est la premiere etape de toute resolution DNS quand le resultat n'est pas en cache.
+</KeyConcept>
+
+<Example brand="Amazon">
+Quand tu tapes `amazon.fr` et que ton cache DNS est vide, la requete remonte jusqu'a un serveur racine. Celui-ci repond : "Pour le `.fr`, contacte les serveurs de l'AFNIC" (l'organisme francais qui gere le .fr). Sans ces serveurs racine, ton navigateur ne saurait meme pas par ou commencer pour trouver Amazon.
+</Example>
+
+<Callout type="info">
+Tu ne contactes presque jamais les serveurs racine directement. Ton resolver DNS local (celui de ton fournisseur d'acces) a deja en cache les adresses des serveurs TLD. Les serveurs racine ne sont interroges qu'en dernier recours, quand personne dans la chaine n'a l'information.
+</Callout>
+
+</Layer>
+
+<Layer id="serveurs-tld" order={4} title="Serveurs TLD" subtitle="Les responsables du .com, .fr, .io" icon="Network">
+
+## Les gardiens des extensions
+
+Les serveurs TLD (Top Level Domain) sont le deuxieme niveau de la hierarchie. Chaque extension a ses propres serveurs : Verisign gere les serveurs du `.com` et du `.net`, l'AFNIC gere le `.fr`, Donuts gere des dizaines d'extensions comme `.io`, `.app`, `.dev`.
+
+Quand le serveur racine t'a aiguille vers le serveur TLD du `.com`, ce dernier ne connait toujours pas l'IP de `netflix.com` directement. Il connait autre chose : le **serveur DNS autoritaire** responsable du domaine `netflix.com`. C'est-a-dire les serveurs DNS que Netflix a configure chez son registrar.
+
+Le serveur TLD repond donc : "Pour `netflix.com`, va voir les serveurs `ns1.netflix.com` et `ns2.netflix.com`". Encore un aiguillage. Le systeme DNS fonctionne comme une chaine de renvois, chaque maillon rapprochant un peu plus de la reponse finale.
+
+<Analogy>
+Les serveurs TLD, c'est le standard regional. Le standard national (serveur racine) t'a transfere vers "la region Ile-de-France" (le TLD). L'operateur regional ne connait pas le numero direct du restaurant, mais il sait que pour "Chez Mario", c'est l'annuaire local du 11e arrondissement qui a l'info. Il te transfere encore une fois.
+</Analogy>
+
+<KeyConcept term="TLD (Top Level Domain)">
+Le TLD est la derniere partie d'un nom de domaine, apres le dernier point : `.com`, `.fr`, `.io`, `.org`. Chaque TLD est gere par un registre specifique qui maintient la liste de tous les domaines enregistres sous cette extension et sait quels serveurs DNS font autorite pour chacun.
+</KeyConcept>
+
+<Example brand="Vercel">
+Vercel utilise le domaine `vercel.app` pour ses deployments automatiques. Le TLD `.app` est gere par Google Registry. Quand tu accedes a `monprojet.vercel.app`, les serveurs TLD du `.app` savent que `vercel.app` est gere par les serveurs DNS de Vercel, et t'y redirigent. C'est pour ca que tes deployments Vercel ont une URL fonctionnelle instantanement.
+</Example>
+
+</Layer>
+
+<Layer id="serveur-dns-autoritaire" order={5} title="Serveur DNS autoritaire" subtitle="Celui qui connait TON domaine" icon="Server">
+
+## La source de verite
+
+Le serveur DNS autoritaire est celui qui connait **reellement** les enregistrements de ton domaine. C'est la source de verite. Quand quelqu'un demande l'IP de `tonsite.com`, c'est ce serveur qui a la reponse definitive.
+
+Ce serveur peut etre celui de ton registrar (OVH, Namecheap) ou celui d'un service DNS specialise (Cloudflare DNS, AWS Route 53, Google Cloud DNS). Quand tu configures tes enregistrements DNS dans le panneau de controle de ton registrar, tu ecris sur ce serveur autoritaire.
+
+Il s'appelle "autoritaire" parce que sa reponse fait autorite — elle ne vient pas d'un cache ou d'un intermediaire, elle vient de la source. Tous les autres serveurs DNS dans la chaine ne font que relayer ou cacher cette information. Si tu modifies un enregistrement sur le serveur autoritaire, c'est la nouvelle verite.
+
+<Analogy>
+Le serveur DNS autoritaire, c'est le carnet d'adresses officiel d'une entreprise. Pas la copie que quelqu'un a faite il y a 6 mois (le cache). Le vrai carnet, celui qui est mis a jour par le proprietaire. Si l'entreprise demenage, c'est dans ce carnet que la nouvelle adresse est ecrite en premier.
+</Analogy>
+
+<KeyConcept term="Serveur DNS autoritaire">
+Un serveur DNS autoritaire est le serveur qui heberge les enregistrements DNS originaux d'un domaine. Il fait "autorite" : sa reponse est la reference. Quand tu modifies un enregistrement A, CNAME ou MX dans l'interface de ton registrar ou de Cloudflare, c'est le serveur autoritaire qui est mis a jour.
+</KeyConcept>
+
+<Example brand="Shopify">
+Quand tu crees une boutique Shopify et que tu connectes ton domaine personnalise, Shopify te demande de pointer tes serveurs DNS vers `ns1.shopify.com` et `ns2.shopify.com`. Ce sont les serveurs DNS autoritaires de Shopify. A partir de la, c'est Shopify qui controle les enregistrements de ton domaine et s'assure qu'il pointe vers ta boutique.
+</Example>
+
+</Layer>
+
+<Layer id="enregistrements-dns" order={6} title="Enregistrements DNS" subtitle="A, CNAME, MX, TXT (les lignes du carnet)" icon="List">
+
+## Les lignes du carnet d'adresses
+
+Les enregistrements DNS sont les lignes concretes stockees sur le serveur autoritaire. Chaque ligne associe un nom a une information. Il existe plusieurs types, chacun avec un role precis.
+
+L'enregistrement **A** est le plus fondamental : il associe un nom a une adresse IPv4. `monsite.com -> 93.184.216.34`. L'enregistrement **AAAA** fait la meme chose en IPv6. L'enregistrement **CNAME** cree un alias : `www.monsite.com -> monsite.com` (un alias qui pointe vers un autre nom, pas une IP).
+
+L'enregistrement **MX** indique quel serveur gere les emails du domaine. C'est grace a lui que les emails envoyes a `contact@monsite.com` arrivent au bon endroit. L'enregistrement **TXT** stocke du texte libre — souvent utilise pour la verification de propriete (Google, Stripe) ou la securite des emails (SPF, DKIM).
+
+<Analogy>
+Les enregistrements DNS, c'est une fiche de contact detaillee. Le record A, c'est l'adresse physique. Le CNAME, c'est "meme adresse que Dupont". Le MX, c'est l'adresse postale pour le courrier. Le TXT, c'est les notes en bas de la fiche : "proprietaire verifie", "accepte les paiements par carte". Chaque ligne a un role precis.
+</Analogy>
+
+<KeyConcept term="Enregistrement A">
+L'enregistrement A (Address) est le type d'enregistrement DNS le plus basique. Il associe un nom de domaine directement a une adresse IPv4. C'est la reponse finale que cherche ton navigateur : "ce nom correspond a cette IP". Sans enregistrement A (ou AAAA pour IPv6), un domaine ne peut pas pointer vers un serveur.
+</KeyConcept>
+
+<Example brand="Google Workspace">
+Quand une entreprise configure Google Workspace pour ses emails, elle doit ajouter des enregistrements MX specifiques : `ASPMX.L.GOOGLE.COM` avec priorite 1, `ALT1.ASPMX.L.GOOGLE.COM` avec priorite 5, etc. Ces enregistrements disent au monde entier : "les emails pour ce domaine doivent etre livres aux serveurs de Google". Sans ca, les emails n'arrivent jamais.
+</Example>
+
+<Callout type="tip">
+Dans Supabase, quand tu configures un domaine personnalise, tu dois ajouter un enregistrement CNAME qui pointe vers le sous-domaine Supabase de ton projet. C'est exactement le meme mecanisme : tu associes ton nom de domaine a l'infrastructure Supabase via les enregistrements DNS.
+</Callout>
+
+</Layer>
+
+<Layer id="resolver-cache" order={7} title="Resolver / Cache" subtitle="Le cache local qui accelere" icon="Zap">
+
+## La memoire qui accelere tout
+
+Parcourir toute la hierarchie DNS (racine, TLD, autoritaire) a chaque requete serait terriblement lent. C'est pour ca que le systeme DNS utilise massivement le **cache** a plusieurs niveaux.
+
+Le premier niveau de cache est ton propre ordinateur. Ton OS memorise les resolutions recentes. Le deuxieme niveau est le **resolver DNS** de ton fournisseur d'acces Internet (ou un resolver public comme `8.8.8.8` de Google ou `1.1.1.1` de Cloudflare). Ce resolver fait le travail de parcourir la hierarchie a ta place, et garde les resultats en cache pour servir les prochaines requetes instantanement.
+
+Chaque enregistrement DNS a un **TTL** (Time To Live) — une duree de vie en secondes. Un TTL de 3600 signifie que le cache garde la reponse pendant 1 heure avant de la redemander au serveur autoritaire. C'est pour ca que quand tu changes un enregistrement DNS, la modification ne se propage pas instantanement : les caches du monde entier gardent l'ancienne valeur jusqu'a expiration de leur TTL.
+
+<Analogy>
+Le cache DNS, c'est ta memoire a court terme. La premiere fois que tu cherches le numero d'un ami, tu le cherches dans ton repertoire (la hierarchie DNS). Ensuite, tu le retiens pendant un moment (le cache). Pendant ce temps, si quelqu'un te demande le numero, tu le connais par coeur — pas besoin de ressortir le repertoire. Mais si ton ami change de numero, tu gardes l'ancien en tete jusqu'a ce que tu re-verifies.
+</Analogy>
+
+<KeyConcept term="TTL (Time To Live)">
+Le TTL est la duree (en secondes) pendant laquelle un enregistrement DNS peut rester en cache avant d'etre redemande au serveur autoritaire. Un TTL de 300 = 5 minutes, 3600 = 1 heure, 86400 = 24 heures. Un TTL court permet des changements rapides mais genere plus de trafic DNS. Un TTL long est plus performant mais rend les changements plus lents a propager.
+</KeyConcept>
+
+<Example brand="Cloudflare">
+Cloudflare DNS (1.1.1.1) est le resolver public le plus rapide au monde, avec un temps de reponse moyen de 11 millisecondes. Quand tu configures ton ordinateur ou ton routeur pour utiliser `1.1.1.1` au lieu du DNS de ton FAI, tes sites se chargent souvent plus vite parce que le cache de Cloudflare est mieux optimise et plus a jour.
+</Example>
+
+</Layer>
+
+<Layer id="resolution-finale" order={8} title="Resolution finale" subtitle="Le navigateur obtient l'IP" icon="CheckCircle">
+
+## Le nom devient une adresse
+
+Le voyage est termine. Apres avoir potentiellement traverse les serveurs racine, TLD et autoritaire (ou plus probablement, apres avoir trouve la reponse dans un cache), ton navigateur obtient enfin l'adresse IP associee au nom de domaine. `netflix.com` devient `54.237.226.164`. La resolution DNS est complete.
+
+Tout ce processus prend generalement entre 1 et 100 millisecondes. Si la reponse etait en cache local, c'est quasi instantane (moins d'1ms). Si elle a du parcourir toute la hierarchie, ca peut prendre jusqu'a 100ms. C'est invisible pour toi, mais c'est une etape obligatoire avant toute communication.
+
+Une fois l'IP obtenue, le navigateur peut etablir la connexion TCP, faire le handshake TLS, envoyer la requete HTTP et recevoir la reponse. Le DNS est le premier maillon de la chaine — sans lui, rien ne demarre. C'est pour ca qu'une panne DNS est si grave : elle ne casse pas les serveurs, elle empeche juste les gens de les trouver.
+
+<Analogy>
+La resolution finale, c'est le moment ou ton GPS trouve enfin l'adresse. Tu as tape "Restaurant Chez Mario" (le nom de domaine), le GPS a cherche dans ses bases (la hierarchie DNS), et maintenant il affiche l'adresse exacte (l'IP) et peut commencer a te guider (etablir la connexion). Sans cette resolution, tu serais perdu.
+</Analogy>
+
+<KeyConcept term="Resolution DNS complete">
+La resolution DNS complete est le processus de bout en bout qui transforme un nom de domaine en adresse IP. Elle implique potentiellement 4 types de serveurs (resolver, racine, TLD, autoritaire) et utilise le cache a chaque etape pour accelerer. Le resultat final est une adresse IP que le navigateur peut utiliser pour se connecter au serveur cible.
+</KeyConcept>
+
+<Example brand="Netflix">
+Quand tu ouvres Netflix, l'app resout `api.netflix.com` en une IP. Mais Netflix utilise le DNS de facon intelligente : le serveur DNS autoritaire de Netflix renvoie une IP differente selon ta localisation geographique. Un utilisateur a Paris obtient l'IP d'un serveur en Europe, un utilisateur a Tokyo obtient une IP au Japon. C'est du **GeoDNS**, et c'est ce qui fait que les videos se chargent vite partout dans le monde.
+</Example>
+
+<Callout type="info">
+Tu peux voir la resolution DNS en action avec la commande `dig netflix.com` ou `nslookup netflix.com` dans ton terminal. Ca te montre chaque etape : quel serveur a repondu, l'IP obtenue, et le TTL restant. C'est un outil de debug indispensable quand un domaine ne pointe pas au bon endroit.
+</Callout>
+
+</Layer>
+
+</LayerStack>

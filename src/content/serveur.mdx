@@ -1,0 +1,179 @@
+<LayerStack>
+
+<Layer id="hardware-serveur" order={1} title="Hardware" subtitle="CPU, RAM, disques, alimentation" icon="Cpu">
+
+## La machine brute qui fait tout tourner
+
+Un serveur, à la base, c'est un ordinateur. Mais un ordinateur conçu pour tourner 24h/24, 365 jours par an, sans jamais s'arrêter. Il a un processeur (ou plusieurs), de la RAM (souvent des centaines de Go), des disques durs ou SSD, des cartes réseau, et des alimentations redondantes. "Redondant" signifie qu'il y a deux alimentations : si l'une lâche, l'autre prend le relais instantanément.
+
+Les serveurs sont souvent au format "rack" — des boîtiers plats de 1U ou 2U (U = unité de rack, environ 4,5 cm de haut) qui s'empilent dans des armoires métalliques standardisées. Un rack peut contenir 42 serveurs empilés. Un datacenter peut contenir des milliers de racks. C'est industriel.
+
+La grosse différence avec ton PC : un serveur n'a pas d'écran, pas de clavier, pas de carte graphique gaming. Tout est optimisé pour le calcul, le stockage et le réseau. Les composants sont de qualité "enterprise" — plus chers, mais conçus pour durer des années sans panne. La RAM a un système de correction d'erreurs (ECC) qui détecte et corrige automatiquement les corruptions de mémoire.
+
+<Analogy>
+Un serveur, c'est comme un moteur de camion de livraison comparé au moteur de ta voiture. Les deux font tourner des roues, mais le moteur du camion est conçu pour rouler 500 000 km, tracter 20 tonnes, et tourner 18 heures par jour sans broncher. Ton PC est la voiture. Le serveur est le camion.
+</Analogy>
+
+<KeyConcept term="Serveur (Hardware)">
+Un ordinateur optimisé pour fonctionner en continu et servir des requêtes à distance. Il possède des composants enterprise (CPU Xeon/EPYC, RAM ECC, alimentations redondantes, disques hot-swap) conçus pour la fiabilité et la performance, pas pour le gaming ou la bureautique. Un serveur se pilote à distance, sans écran ni clavier.
+</KeyConcept>
+
+<Example brand="Dell">
+Dell est l'un des plus grands fabricants de serveurs au monde avec sa gamme PowerEdge. Un serveur Dell PowerEdge R760, typique dans un datacenter, peut embarquer deux processeurs Intel Xeon avec 128 coeurs au total, jusqu'à 8 To de RAM, et 24 disques SSD NVMe. C'est la machine brute sur laquelle tournent tes sites web, tes APIs et tes applications cloud.
+</Example>
+
+</Layer>
+
+<Layer id="bios-firmware" order={2} title="BIOS/Firmware" subtitle="Le logiciel gravé dans la puce" icon="Chip">
+
+## Le premier logiciel qui s'exécute
+
+Quand un serveur démarre, le système d'exploitation n'est pas encore chargé. C'est le BIOS (ou son successeur UEFI) qui prend les commandes. Ce micro-logiciel est gravé directement dans une puce de la carte mère. Il fait les vérifications de base : le processeur fonctionne-t-il ? La RAM est-elle détectée ? Les disques sont-ils branchés ? Si tout va bien, il passe la main au bootloader qui chargera Linux.
+
+Le firmware, c'est le logiciel "en dur" qui pilote les composants. Chaque composant a le sien : le firmware du contrôleur RAID gère les disques, le firmware de la carte réseau gère la connexion, le firmware du BMC (Baseboard Management Controller) permet de piloter le serveur à distance même quand il est éteint.
+
+Le BMC est un truc fascinant sur les serveurs. C'est un mini-ordinateur dans l'ordinateur, avec sa propre IP réseau, son propre système d'exploitation. Il te permet de redémarrer le serveur, accéder à la console, monter un ISO pour réinstaller l'OS — tout ça à distance, même si Linux est planté. C'est comme avoir un technicien invisible devant la machine 24h/24.
+
+<Analogy>
+Le BIOS, c'est comme la check-list qu'un pilote d'avion fait avant le décollage. Avant de démarrer les moteurs (le système d'exploitation), il vérifie les instruments, les commandes, le carburant. Si quelque chose ne va pas, l'avion ne décolle pas. Le BIOS fait cette inspection à chaque démarrage du serveur.
+</Analogy>
+
+<KeyConcept term="BIOS/UEFI">
+Le premier logiciel qui s'exécute au démarrage d'un ordinateur, avant le système d'exploitation. Il est stocké dans une puce mémoire sur la carte mère. UEFI est le successeur moderne du BIOS, plus rapide et plus sécurisé. Son rôle : tester le hardware, initialiser les composants, puis lancer le bootloader qui chargera l'OS.
+</KeyConcept>
+
+<Example brand="Hewlett Packard Enterprise">
+HPE a développé iLO (Integrated Lights-Out), l'un des BMC les plus connus du marché serveur. Grâce à iLO, un administrateur peut gérer un serveur HP dans un datacenter à Tokyo depuis son bureau à Paris : voir la console à distance, redémarrer la machine, mettre à jour le firmware, surveiller la température des composants — tout via une interface web, sans jamais toucher physiquement le serveur.
+</Example>
+
+</Layer>
+
+<Layer id="os" order={3} title="Système d'exploitation" subtitle="Le chef d'orchestre" icon="Monitor">
+
+## Le logiciel qui donne vie à la machine
+
+Le système d'exploitation (OS) est la couche logicielle qui transforme un amas de composants électroniques en machine utilisable. Il gère la mémoire, le processeur, les fichiers, le réseau, les utilisateurs et les permissions. Sur un serveur, c'est presque toujours Linux (Ubuntu Server, Debian, RHEL, AlmaLinux) ou, plus rarement, Windows Server.
+
+Un OS serveur est différent d'un OS desktop. Pas de bureau graphique (en général), pas de navigateur web, pas de lecteur vidéo. Tout est optimisé pour la performance et la stabilité. Le serveur démarre en mode texte, prêt à exécuter des services. Chaque programme installé consomme de la RAM et du CPU, donc on installe le strict minimum.
+
+Linux domine le monde des serveurs pour plusieurs raisons : il est gratuit, open source, extrêmement stable (un serveur Linux peut tourner des années sans redémarrage), léger (il peut tourner avec 256 Mo de RAM), et ultra-configurable. Plus de 90% des serveurs dans le monde tournent sous Linux.
+
+<Analogy>
+Le système d'exploitation, c'est le manager d'un restaurant. Il ne cuisine pas lui-même (ce sont les applications qui font le vrai travail), mais il coordonne tout : il assigne les tables aux serveurs (allocation CPU), gère les stocks (la mémoire), prend les réservations (les connexions réseau) et s'assure que la cuisine ne prend pas feu (la sécurité). Sans manager, c'est le chaos.
+</Analogy>
+
+<KeyConcept term="Linux Server">
+Un système d'exploitation basé sur le noyau Linux, configuré pour fonctionner comme serveur. Il n'a généralement pas d'interface graphique et s'administre en ligne de commande. Les distributions serveur les plus populaires sont Ubuntu Server, Debian, AlmaLinux (successeur de CentOS) et Red Hat Enterprise Linux (RHEL).
+</KeyConcept>
+
+<Example brand="Amazon">
+Amazon.com, l'un des plus gros sites e-commerce au monde, fonctionne entièrement sur des serveurs Linux. AWS (Amazon Web Services), leur branche cloud, a même créé sa propre distribution Linux : Amazon Linux. Elle est optimisée pour tourner sur leur infrastructure. Quand tu achètes quelque chose sur Amazon, ta commande est traitée par des dizaines de serveurs Linux qui communiquent entre eux en quelques millisecondes.
+</Example>
+
+</Layer>
+
+<Layer id="services-daemons" order={4} title="Services & Daemons" subtitle="Les programmes qui tournent en permanence" icon="Cog">
+
+## Les travailleurs de l'ombre
+
+Un daemon (prononcé "démon") est un programme qui tourne en arrière-plan, sans interface visible, en attendant qu'on ait besoin de lui. Nginx (serveur web) est un daemon. PostgreSQL (base de données) est un daemon. sshd (le service SSH) est un daemon. Docker est un daemon. Ils démarrent avec le serveur et tournent en permanence, silencieusement.
+
+Le nom vient de la mythologie grecque — les daemons étaient des esprits invisibles qui faisaient le travail entre les dieux et les humains. En informatique, c'est pareil : les daemons font le travail entre le hardware et les utilisateurs, sans qu'on les voie.
+
+Systemd est le gestionnaire de services de Linux. C'est lui qui lance les daemons au démarrage, les surveille, les redémarre s'ils plantent, et les arrête proprement à l'extinction. Quand tu fais `systemctl start nginx`, tu demandes à systemd de lancer le daemon Nginx. `systemctl enable nginx` le configure pour démarrer automatiquement à chaque boot.
+
+<Analogy>
+Les daemons, c'est comme les vigiles d'un immeuble. Ils sont toujours là, 24h/24, à surveiller les entrées, vérifier les badges, ouvrir les portes. Tu ne les remarques pas quand tout va bien, mais sans eux, n'importe qui pourrait entrer et l'immeuble serait en danger. Chaque daemon est un vigile spécialisé : un pour le web, un pour la base de données, un pour le SSH.
+</Analogy>
+
+<KeyConcept term="Daemon">
+Un programme qui s'exécute en arrière-plan en tant que service, sans interaction directe avec l'utilisateur. Le nom se termine souvent par "d" (sshd, httpd, mysqld). Un daemon démarre avec le serveur, attend les requêtes, les traite, et tourne en boucle indéfiniment. C'est la brique de base de tout serveur.
+</KeyConcept>
+
+<Example brand="Uber">
+Quand tu ouvres l'app Uber, ta requête arrive sur des serveurs qui font tourner des centaines de daemons différents : un daemon pour géolocaliser les chauffeurs, un daemon pour calculer les prix, un daemon pour gérer les paiements, un daemon pour envoyer les notifications push. Chaque daemon est spécialisé dans une tâche précise et tourne 24h/24 pour que tu puisses commander un Uber à 3h du matin.
+</Example>
+
+<Callout type="tip">
+La commande `systemctl list-units --type=service --state=running` te montre tous les services qui tournent actuellement sur ton serveur. C'est le premier réflexe pour comprendre ce qui se passe sur une machine inconnue.
+</Callout>
+
+</Layer>
+
+<Layer id="ports-ecoute" order={5} title="Ports & Écoute" subtitle="Les portes d'entrée numériques" icon="DoorOpen">
+
+## Les adresses internes de chaque service
+
+Un serveur a une seule adresse IP, mais il peut faire tourner des dizaines de services différents. Comment distinguer une requête web d'une connexion SSH d'un accès à la base de données ? Grâce aux ports. Chaque service "écoute" sur un numéro de port spécifique. Le port 80, c'est HTTP. Le port 443, c'est HTTPS. Le port 22, c'est SSH. Le port 5432, c'est PostgreSQL.
+
+Quand tu tapes `https://monsite.com` dans ton navigateur, ton ordinateur se connecte à l'IP du serveur sur le port 443. Le serveur sait que le port 443, c'est Nginx, et il route la requête vers le bon daemon. Si un hacker tente de se connecter sur le port 22 (SSH), c'est le daemon sshd qui répond.
+
+Il y a 65 535 ports possibles sur un serveur. Les ports 0-1023 sont "réservés" pour les services standards (HTTP, HTTPS, SSH, FTP, DNS...). Les ports 1024-49151 sont utilisés par les applications (n8n sur 5678, Supabase Studio sur 3000, PostgreSQL sur 5432). Les ports au-delà sont utilisés temporairement par le système.
+
+<Analogy>
+Imagine un immeuble de bureaux avec une seule adresse postale (l'IP). Pour que le courrier arrive au bon bureau, chaque porte a un numéro (le port). Le courrier pour le comptable va à la porte 443, celui pour l'informaticien va à la porte 22, celui pour l'archiviste va à la porte 5432. L'adresse IP identifie l'immeuble, le port identifie le bureau.
+</Analogy>
+
+<KeyConcept term="Port">
+Un numéro entre 0 et 65535 qui identifie un service spécifique sur un serveur. Quand un daemon démarre, il "écoute" (listen) sur un port donné. Les requêtes entrantes sur ce port sont routées vers ce daemon. Un seul programme peut écouter sur un port donné à la fois — c'est pour ça que tu obtiens une erreur "port already in use" si tu essaies de lancer deux services sur le même port.
+</KeyConcept>
+
+<Example brand="Nike">
+Quand tu achètes des sneakers sur nike.com, ta connexion arrive sur le port 443 (HTTPS) d'un des serveurs de Nike. Derrière, l'application interne communique avec une base de données sur le port 5432, un service de cache Redis sur le port 6379, et un système de paiement interne sur un port custom. Chaque port est une porte vers un service différent, et tout fonctionne en parallèle sur la même machine.
+</Example>
+
+</Layer>
+
+<Layer id="requetes-entrantes" order={6} title="Requêtes entrantes" subtitle="Les demandes des clients" icon="ArrowDownToLine">
+
+## Les questions que le monde pose à ton serveur
+
+Une requête entrante, c'est un message envoyé par un client (navigateur web, application mobile, un autre serveur, un workflow n8n) à ton serveur. Ce message dit essentiellement : "Salut serveur, j'ai besoin de quelque chose." Il contient plusieurs informations : l'adresse demandée (URL), la méthode (GET pour lire, POST pour créer), des en-têtes (headers) et parfois des données (body).
+
+Les requêtes HTTP sont les plus courantes. Quand tu visites un site web, ton navigateur envoie des dizaines de requêtes : une pour la page HTML, une pour chaque fichier CSS, une pour chaque fichier JavaScript, une pour chaque image. Chaque requête arrive sur le serveur, est traitée, et une réponse est renvoyée. Tout ça en quelques millisecondes.
+
+Un serveur populaire peut recevoir des milliers de requêtes par seconde. Chaque requête doit être analysée, authentifiée (qui l'envoie ?), autorisée (a-t-il le droit ?), traitée (que faut-il renvoyer ?) et logguée (garder une trace). C'est un travail colossal que les daemons comme Nginx gèrent avec une efficacité remarquable.
+
+<Analogy>
+Les requêtes, c'est comme les commandes dans un restaurant. Chaque client envoie sa commande (la requête) au serveur (le daemon). La commande contient ce qu'il veut (GET /menu), parfois des précisions (sans gluten, sans lactose = les headers), et le serveur transmet à la cuisine (l'application backend) qui prépare le plat (la réponse).
+</Analogy>
+
+<KeyConcept term="Requête HTTP">
+Un message structuré envoyé par un client à un serveur via le protocole HTTP. Elle contient une méthode (GET, POST, PUT, DELETE), une URL (/api/users), des headers (Content-Type, Authorization) et optionnellement un body (les données envoyées). Le serveur lit la requête et renvoie une réponse avec un code de statut (200, 404, 500...).
+</KeyConcept>
+
+<Example brand="Twitter/X">
+Quand tu scrolles ton fil Twitter, ton téléphone envoie des requêtes à répétition aux serveurs de X : "donne-moi les 20 prochains tweets" (GET /api/timeline), "j'ai liké ce tweet" (POST /api/like), "charge l'image de ce tweet" (GET /media/photo123.jpg). Chaque action dans l'app se traduit par une ou plusieurs requêtes HTTP envoyées aux serveurs de X.
+</Example>
+
+</Layer>
+
+<Layer id="reponses" order={7} title="Réponses" subtitle="Ce que le serveur renvoie" icon="ArrowUpFromLine">
+
+## Le retour du service rendu
+
+Pour chaque requête reçue, le serveur renvoie une réponse. Cette réponse contient trois éléments : un code de statut (200 OK, 404 Not Found, 500 Internal Server Error), des headers (le type de contenu, la taille, les cookies) et un body (le contenu lui-même : du HTML, du JSON, une image, un fichier).
+
+Les codes de statut sont universels et suivent une logique simple. Les 2xx, c'est "tout va bien" (200 OK, 201 Created). Les 3xx, c'est "va voir ailleurs" (301 Redirect). Les 4xx, c'est "tu as fait une erreur" (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found). Les 5xx, c'est "le serveur a planté" (500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable).
+
+La performance des réponses est cruciale. Google a prouvé qu'un retard de 100 millisecondes sur le temps de réponse fait baisser les ventes de 1%. Amazon a mesuré que chaque 100ms de latence leur coûte 1% de revenus. C'est pour ça que l'optimisation des réponses serveur est un métier à part entière.
+
+<Analogy>
+La réponse du serveur, c'est comme le plat que le serveur du restaurant te apporte. Le code de statut, c'est la tête du serveur quand il arrive : souriant (200 = tout va bien), confus (404 = on n'a pas trouvé ce que tu voulais), ou paniqué (500 = la cuisine a pris feu). Le body, c'est le plat lui-même. Les headers, c'est l'étiquette avec les allergènes.
+</Analogy>
+
+<KeyConcept term="Code de statut HTTP">
+Un nombre à 3 chiffres renvoyé par le serveur pour indiquer le résultat du traitement de la requête. 200 = succès, 301 = redirection permanente, 400 = mauvaise requête, 401 = non authentifié, 403 = interdit, 404 = pas trouvé, 500 = erreur serveur, 503 = service indisponible. Connaître ces codes est essentiel pour débugger les problèmes web.
+</KeyConcept>
+
+<Example brand="Cloudflare">
+Cloudflare, le géant du CDN et de la protection web, a rendu célèbre l'erreur 522 (Connection timed out). Quand tu vois cette page Cloudflare, ça signifie que Cloudflare a bien reçu ta requête, mais le serveur d'origine (celui de ton site) n'a pas répondu à temps. Cloudflare gère plus de 20% du trafic web mondial et renvoie des milliards de réponses par jour, en ajoutant ses propres headers de sécurité et de performance.
+</Example>
+
+<Callout type="info">
+Le code 418 "I'm a teapot" existe vraiment dans la spécification HTTP. C'est un poisson d'avril de 1998 (RFC 2324) devenu une tradition. Certaines APIs l'utilisent comme easter egg. Google le retourne si tu cherches "418 teapot" dans Chrome DevTools.
+</Callout>
+
+</Layer>
+
+</LayerStack>

@@ -1,0 +1,207 @@
+<LayerStack>
+
+<Layer id="bits-octets" order={1} title="Bits & Octets" subtitle="Comment un ordinateur stocke l'information" icon="Binary">
+
+## Le langage natif de la machine
+
+Tout au fond, un ordinateur ne comprend que deux choses : 0 et 1. C'est le systeme binaire. Chaque 0 ou 1 s'appelle un bit. Regroupe 8 bits ensemble, tu obtiens un octet (byte en anglais). Un octet peut representer 256 valeurs differentes (de 0 a 255).
+
+Quand tu ecris la lettre "A" dans un fichier, l'ordinateur ne stocke pas un "A". Il stocke le nombre 65 (en code ASCII), soit `01000001` en binaire. Chaque caractere, chaque chiffre, chaque emoji a son numero. C'est le systeme d'encodage (ASCII, puis Unicode/UTF-8 pour supporter toutes les langues du monde) qui fait la traduction.
+
+Pourquoi c'est important pour comprendre le JSON ? Parce que JSON est du texte, et le texte est une suite d'octets. Quand une API t'envoie du JSON, c'est en realite une suite de 0 et de 1 qui voyage sur le reseau. Ton navigateur ou ton serveur decode cette suite pour en faire du texte lisible.
+
+<Analogy>
+Les bits, c'est comme le code Morse. Le telegraphe ne peut envoyer que deux signaux : court (point) et long (trait). Pourtant, avec ces deux signaux, on peut encoder n'importe quel message. Pareil pour les ordinateurs : avec juste des 0 et des 1, ils encodent des textes, des images, des videos, et bien sur du JSON.
+</Analogy>
+
+<KeyConcept term="Encodage (UTF-8)">
+Le systeme qui transforme des caracteres humains (lettres, chiffres, emojis) en nombres que l'ordinateur peut stocker. UTF-8 est le standard universel qui couvre tous les alphabets du monde. JSON utilise exclusivement UTF-8 comme encodage, ce qui le rend lisible partout sur la planete.
+</KeyConcept>
+
+<Example brand="WhatsApp">
+Quand tu envoies un message sur WhatsApp, chaque lettre est convertie en octets via UTF-8, ces octets sont chiffres (pour la securite), envoyes sur le reseau sous forme de bits, puis reconvertis en texte lisible sur le telephone de ton correspondant. Le JSON est utilise en arriere-plan pour structurer les metadonnees du message (expediteur, horodatage, statut de lecture).
+</Example>
+
+</Layer>
+
+<Layer id="texte-brut" order={2} title="Texte brut (string)" subtitle="Du texte sans structure" icon="Type">
+
+## Juste des caracteres a la suite
+
+Le texte brut, c'est une suite de caracteres sans aucune organisation. Pas de mise en forme, pas de structure, pas de hierarchie. C'est le format le plus basique : ce que tu vois dans un fichier `.txt`.
+
+Le probleme du texte brut, c'est qu'il n'a pas de sens pour une machine. Si tu ecris `Jean Martin 35 ans Paris`, un humain comprend qu'il s'agit d'une personne, mais un programme ne sait pas ou commence le nom, ou finit l'age, ou se trouve la ville. Il faut une convention, une structure pour rendre le texte interpretable par un programme.
+
+Avant JSON, on utilisait des formats comme CSV (valeurs separees par des virgules) ou XML (des balises comme le HTML). CSV est trop simple pour des donnees complexes. XML est puissant mais verbeux et penible a lire. JSON est arrive comme le juste milieu : structure, lisible, leger.
+
+<Analogy>
+Le texte brut, c'est comme un tas de vetements en vrac sur le sol. Tu sais que ce sont des vetements, mais tu ne sais pas lesquels sont des pantalons, lesquels sont des t-shirts, lesquels sont a toi ou a quelqu'un d'autre. JSON, c'est ce meme tas range dans une armoire avec des tiroirs etiquetes.
+</Analogy>
+
+<KeyConcept term="Texte brut (Plain Text)">
+Du texte sans formatage ni structure. Chaque caractere est stocke tel quel, sans metadonnees. Les fichiers `.txt`, le contenu d'un terminal, ou le corps d'une requete HTTP basique sont du texte brut. JSON est du texte brut qui suit des regles precises de formatage.
+</KeyConcept>
+
+<Example brand="Notion">
+Quand tu exportes une page Notion en texte brut, tu perds toute la structure : les colonnes, les toggles, les bases de donnees. Tout devient une soupe de texte lineaire. C'est pourquoi Notion utilise en interne du JSON pour stocker la structure de chaque page : chaque bloc (titre, paragraphe, image, tableau) est un objet JSON avec ses proprietes.
+</Example>
+
+</Layer>
+
+<Layer id="paires-cle-valeur" order={3} title="Paires cle-valeur" subtitle="Le concept fondamental de JSON" icon="KeyRound">
+
+## Le coeur de JSON
+
+Le JSON repose sur un concept ultra-simple : la paire cle-valeur. Une cle (un nom entre guillemets), deux-points, une valeur. C'est tout. `"prenom": "Jean"` signifie que la cle "prenom" a la valeur "Jean". C'est comme une etiquette collee sur une boite.
+
+Plusieurs paires cle-valeur regroupees entre accolades `{}` forment un objet. C'est la structure de base du JSON. Un objet peut avoir autant de paires que tu veux, separees par des virgules.
+
+La force de ce systeme, c'est sa lisibilite. Meme sans connaitre JSON, tu peux lire `{"nom": "Dupont", "age": 35, "ville": "Paris"}` et comprendre immediatement de quoi il s'agit. C'est cette simplicite qui a fait de JSON le standard universel d'echange de donnees.
+
+<Analogy>
+Les paires cle-valeur, c'est comme les champs d'un formulaire administratif. Le champ "Nom" (la cle) a un espace pour ecrire ta reponse (la valeur). Le champ "Date de naissance" a un autre espace. Chaque champ a un nom fixe, et la valeur change selon la personne qui remplit le formulaire.
+</Analogy>
+
+<KeyConcept term="Paire cle-valeur">
+L'unite fondamentale du JSON. La cle est toujours une chaine de caracteres entre guillemets doubles. La valeur peut etre de n'importe quel type JSON (string, number, boolean, null, array, object). La cle et la valeur sont separees par deux-points. Exemple : `"email": "jean@mail.com"`.
+</KeyConcept>
+
+<Example brand="Stripe">
+Quand tu crees un paiement via l'API Stripe, tu envoies un objet JSON avec des paires cle-valeur : `{"amount": 2000, "currency": "eur", "customer": "cus_abc123"}`. Chaque cle a un sens precis pour Stripe. Le montant est en centimes (2000 = 20 euros), la devise est un code ISO, et le customer est un identifiant unique. Pas de place pour l'ambiguite.
+</Example>
+
+<Callout type="warning">
+Les cles JSON doivent TOUJOURS etre entre guillemets doubles. `{nom: "Jean"}` n'est PAS du JSON valide, c'est du JavaScript. Le JSON correct est `{"nom": "Jean"}`. C'est l'erreur la plus frequente quand on debute.
+</Callout>
+
+</Layer>
+
+<Layer id="types-donnees" order={4} title="Types de donnees" subtitle="String, number, boolean, null, array, object" icon="List">
+
+## Les six briques de base
+
+JSON ne connait que 6 types de donnees. Pas un de plus, pas un de moins. C'est cette simplicite qui le rend universel : n'importe quel langage de programmation sait gerer ces 6 types.
+
+Les types primitifs : **String** (texte entre guillemets : `"Bonjour"`), **Number** (entier ou decimal : `42`, `3.14`), **Boolean** (vrai ou faux : `true`, `false`), et **Null** (absence de valeur : `null`).
+
+Les types structures : **Array** (liste ordonnee entre crochets : `[1, 2, 3]`) et **Object** (ensemble de paires cle-valeur entre accolades : `{"a": 1}`). Les arrays et objects peuvent contenir n'importe quel autre type, y compris d'autres arrays et objects. C'est cette capacite d'imbrication qui donne a JSON toute sa puissance.
+
+<Analogy>
+Les types JSON, c'est comme les pieces d'un jeu LEGO. Tu n'as que quelques formes de base (carre, rectangle, plaque), mais en les combinant, tu peux construire absolument n'importe quoi : une maison, un vaisseau spatial, une ville entiere. Les 6 types JSON, c'est pareil : simples individuellement, infiniment puissants combines.
+</Analogy>
+
+<KeyConcept term="Types de donnees JSON">
+Les 6 types que JSON reconnait : String (texte), Number (nombre), Boolean (true/false), Null (vide), Array (liste ordonnee), Object (ensemble cle-valeur). Attention : JSON ne supporte PAS les dates, les fonctions, les commentaires, ni les valeurs undefined. Une date doit etre stockee comme string ("2026-03-13").
+</KeyConcept>
+
+<Example brand="n8n">
+Dans un workflow n8n, quand tu recois des donnees d'un webhook, chaque champ arrive type en JSON. Le prix est un Number (`49.99`), le nom du produit est une String (`"Nike Air Max"`), la disponibilite est un Boolean (`true`), et la liste des tailles est un Array (`[38, 39, 40, 41, 42]`). Savoir reconaitre ces types est essentiel pour manipuler les donnees dans tes nodes.
+</Example>
+
+</Layer>
+
+<Layer id="imbrication" order={5} title="Imbrication" subtitle="Des objets dans des objets" icon="Layers">
+
+## La profondeur du JSON
+
+L'imbrication, c'est la capacite de mettre des objets et des arrays a l'interieur d'autres objets et arrays. C'est la que JSON devient vraiment puissant. Tu peux representer des structures de donnees complexes avec des relations entre entites.
+
+Par exemple, un utilisateur peut avoir une adresse (objet imbrique), une liste de commandes (array d'objets), et chaque commande peut avoir une liste de produits (encore un array d'objets). Ca donne une arborescence, une hierarchie de donnees.
+
+Attention a ne pas trop imbriquer. Un JSON avec 15 niveaux de profondeur devient illisible et difficile a manipuler. En general, 3-4 niveaux suffisent. Si tu depasses, c'est souvent signe que tu devrais repenser ta structure de donnees.
+
+<Analogy>
+L'imbrication, c'est comme les poupees russes (matriochkas). Chaque poupee contient une poupee plus petite. Un objet JSON "entreprise" contient un array "employes", chaque employe contient un objet "adresse", chaque adresse contient des strings "rue", "ville", "pays". Chaque niveau apporte plus de detail.
+</Analogy>
+
+<KeyConcept term="Imbrication (Nesting)">
+Le fait de placer des structures JSON (objets ou arrays) a l'interieur d'autres structures. Ca permet de representer des donnees hierarchiques et relationnelles. L'acces a une valeur imbriquee se fait par cheminement : `user.address.city` ou `user["address"]["city"]`.
+</KeyConcept>
+
+<Example brand="Uber">
+Quand l'app Uber affiche les details d'une course, l'API renvoie un JSON profondement imbrique : un objet course contenant un objet conducteur (avec nom, photo, note, vehicule), un objet itineraire (avec un array de coordonnees GPS), un objet tarification (avec prix de base, surcharge, pourboire). Toute cette complexite tient dans un seul document JSON structure.
+</Example>
+
+<Callout type="tip">
+Dans n8n, pour acceder a une valeur imbriquee, tu utilises la notation par points : `$json.order.items[0].name` pour acceder au nom du premier article d'une commande. Les crochets `[0]` servent a acceder a un element d'un array par son index (qui commence a 0).
+</Callout>
+
+</Layer>
+
+<Layer id="serialisation-parsing" order={6} title="Serialisation / Parsing" subtitle="Texte vers objet et retour" icon="RefreshCw">
+
+## La traduction entre deux mondes
+
+Le JSON existe sous deux formes : du texte (une chaine de caracteres) et un objet en memoire (une structure que le code peut manipuler). La serialisation, c'est transformer un objet en texte JSON. Le parsing, c'est l'inverse : transformer du texte JSON en objet manipulable.
+
+Quand une API envoie du JSON sur le reseau, c'est du texte. Ton programme doit le "parser" (analyser) pour le transformer en un objet utilisable. En JavaScript, c'est `JSON.parse()`. A l'inverse, quand tu veux envoyer des donnees a une API, tu "serialises" ton objet en texte JSON avec `JSON.stringify()`.
+
+Si le texte JSON est mal forme (une virgule en trop, un guillemet manquant), le parsing echoue avec une erreur. C'est pourquoi la syntaxe JSON est stricte : pas de commentaires, guillemets doubles obligatoires, pas de virgule apres le dernier element.
+
+<Analogy>
+La serialisation/parsing, c'est comme traduire un livre. Le parsing, c'est traduire du francais (texte JSON) vers la langue maternelle du programme (objet en memoire). La serialisation, c'est traduire de la langue du programme vers le francais. Si le texte original contient des fautes de grammaire (JSON invalide), la traduction echoue.
+</Analogy>
+
+<KeyConcept term="Serialisation / Parsing">
+Serialisation : convertir un objet en memoire en chaine de texte JSON (pour le stocker ou l'envoyer sur le reseau). Parsing (ou deserialisation) : convertir une chaine de texte JSON en objet manipulable par le code. Ces deux operations sont fondamentales dans toute communication entre systemes.
+</KeyConcept>
+
+<Example brand="Supabase">
+Quand tu fais `const { data } = await supabase.from('users').select('*')`, le client Supabase envoie une requete HTTP, recoit du texte JSON en reponse, et le parse automatiquement en objet JavaScript. La variable `data` est deja un array d'objets pret a l'emploi. Tu ne vois jamais le texte JSON brut, le parsing est fait en coulisses par la librairie.
+</Example>
+
+</Layer>
+
+<Layer id="json-apis" order={7} title="JSON dans les APIs" subtitle="Le format universel du web" icon="Globe">
+
+## La lingua franca du web
+
+JSON est devenu LE format standard pour les APIs web. Quand deux services communiquent sur Internet, dans l'ecrasante majorite des cas, ils s'echangent du JSON. Les requetes envoient du JSON, les reponses renvoient du JSON.
+
+Pourquoi JSON a gagne face aux autres formats ? Il est lisible par les humains (contrairement au binaire), il est leger (contrairement au XML qui est 2 a 3 fois plus volumineux), et il est natif en JavaScript (le langage du web). Tous les langages de programmation ont des librairies pour lire et ecrire du JSON.
+
+Les headers HTTP `Content-Type: application/json` et `Accept: application/json` indiquent que la communication se fait en JSON. C'est devenu tellement la norme que beaucoup d'APIs ne supportent meme plus d'autre format.
+
+<Analogy>
+JSON dans les APIs, c'est comme l'anglais dans le business international. Un japonais et un bresilien qui font des affaires ensemble parlent anglais, pas parce que c'est la meilleure langue, mais parce que c'est celle que les deux comprennent. JSON, c'est pareil : Python et Java ne se comprennent pas directement, mais les deux parlent JSON.
+</Analogy>
+
+<KeyConcept term="API REST + JSON">
+Le combo standard du web moderne. Une API REST expose des endpoints (URLs) que tu appelles avec des methodes HTTP (GET, POST, PUT, DELETE). Les donnees sont echangees en format JSON. C'est le modele utilise par la quasi-totalite des services web : Stripe, Twilio, OpenAI, Supabase, GitHub...
+</KeyConcept>
+
+<Example brand="OpenAI">
+L'API d'OpenAI est un parfait exemple de JSON en action. Tu envoies un JSON avec ton prompt : `{"model": "gpt-4", "messages": [{"role": "user", "content": "Bonjour"}]}`. L'API te repond en JSON avec la reponse generee, le nombre de tokens utilises, et d'autres metadonnees. Toute la communication est du JSON aller-retour.
+</Example>
+
+</Layer>
+
+<Layer id="json-quotidien" order={8} title="JSON au quotidien" subtitle="Config files, package.json, n8n" icon="FileJson">
+
+## JSON est partout
+
+Au-dela des APIs, JSON est utilise partout comme format de configuration et de stockage. Le `package.json` de ton projet Node.js, le `tsconfig.json` de TypeScript, les settings de VS Code, les exports de workflows n8n... tout est du JSON.
+
+Quand tu exportes un workflow n8n, tu obtiens un fichier JSON qui decrit chaque node, chaque connexion, chaque parametre. Tu peux l'importer dans une autre instance n8n, le versionner avec Git, ou le modifier a la main. Cette portabilite est une des forces majeures du JSON.
+
+Les fichiers de configuration en JSON ont un inconvenient : pas de commentaires. C'est une limitation volontaire de la specification JSON. C'est pourquoi des variantes comme JSON5 ou JSONC (JSON with Comments) existent. TypeScript (`tsconfig.json`) utilise JSONC pour permettre les commentaires dans ses fichiers de configuration.
+
+<Analogy>
+JSON au quotidien, c'est comme les etiquettes sur les produits au supermarche. Chaque produit a la meme structure d'etiquette (nom, ingredients, valeurs nutritionnelles, prix), ce qui te permet de comparer facilement. Si chaque marque utilisait son propre format d'etiquette, ce serait le chaos. JSON standardise l'etiquetage des donnees dans le monde numerique.
+</Analogy>
+
+<KeyConcept term="package.json">
+Le fichier central de tout projet Node.js/JavaScript. C'est du JSON qui decrit le nom du projet, sa version, ses dependances (les librairies utilisees), ses scripts (dev, build, test), et d'autres metadonnees. `npm install` lit ce fichier pour savoir quoi telecharger. C'est la carte d'identite de ton projet.
+</KeyConcept>
+
+<Example brand="n8n">
+Quand tu partages un workflow n8n, tu exportes un fichier JSON qui contient toute la logique : les nodes, leurs parametres, les connexions, les credentials (cryptees). Un fichier JSON de 200 lignes peut representer une automatisation complexe avec 15 etapes. C'est cette portabilite qui permet a la communaute n8n de partager des templates sur n8n.io/workflows.
+</Example>
+
+<Callout type="tip">
+Installe l'extension "Prettier" dans VS Code pour formater automatiquement tes fichiers JSON. Un JSON mal indente est un cauchemar a lire. Prettier reindente tout proprement en un raccourci clavier.
+</Callout>
+
+</Layer>
+
+</LayerStack>

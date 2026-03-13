@@ -1,0 +1,211 @@
+<LayerStack>
+
+<Layer id="fichiers-disque" order={1} title="Fichiers sur un disque" subtitle="Le point de depart" icon="File">
+
+## Avant Git, le chaos
+
+Tout commence par des fichiers. Du code, des images, des configs, poses sur un disque dur. Sans systeme de versioning, c'est le far west. Tu modifies un fichier, tu sauvegardes, et l'ancienne version disparait a jamais. Qui n'a jamais eu un dossier avec `projet_final.zip`, `projet_final_v2.zip`, `projet_VRAIMENT_final.zip` ?
+
+Le probleme fondamental, c'est qu'un fichier sur un disque n'a pas de memoire. Il ne sait pas ce qu'il contenait hier, qui l'a modifie, ni pourquoi. Si tu fais une erreur et que tu sauvegardes par-dessus, c'est fini. Et si tu travailles a plusieurs sur les memes fichiers, c'est la catastrophe assuree : qui a la "bonne" version ?
+
+C'est exactement ce probleme que Git resout. Il ajoute une couche de memoire et de suivi au-dessus de tes fichiers.
+
+<Analogy>
+Sans Git, c'est comme ecrire un livre sur un tableau blanc. Tu peux effacer et reecrire, mais tu perds tout ce que tu as efface. Git, c'est comme avoir un photographe qui prend une photo du tableau a chaque modification importante. Tu peux toujours revenir voir a quoi le tableau ressemblait a n'importe quel moment.
+</Analogy>
+
+<KeyConcept term="Working Directory">
+Le dossier de travail ou se trouvent tes fichiers. C'est ce que tu vois dans ton explorateur de fichiers ou ton editeur de code. Git surveille ce dossier pour detecter les modifications, mais tant que tu ne fais pas de commit, les changements ne sont pas sauvegardes dans l'historique.
+</KeyConcept>
+
+<Example brand="Google Docs">
+Google Docs a resolu ce probleme pour les documents texte avec l'historique des versions automatique. Tu peux voir qui a modifie quoi et quand, et revenir a n'importe quelle version precedente. Git fait la meme chose, mais pour du code et des fichiers techniques, avec beaucoup plus de puissance et de controle.
+</Example>
+
+</Layer>
+
+<Layer id="snapshots-commits" order={2} title="Snapshots (commits)" subtitle="Photographier l'etat du projet" icon="Camera">
+
+## Figer un instant dans le temps
+
+Un commit, c'est une photo de l'etat complet de ton projet a un instant T. Quand tu fais un commit, Git enregistre exactement quels fichiers existent, ce qu'ils contiennent, qui a fait la modification, quand, et un message qui explique pourquoi.
+
+Le processus se fait en deux etapes. D'abord tu "stages" les fichiers que tu veux inclure (`git add`), puis tu valides avec un message (`git commit -m "..."`). Cette etape intermediaire te permet de choisir precisement ce que tu veux sauvegarder, plutot que de tout prendre en vrac.
+
+Chaque commit recoit un identifiant unique (un hash SHA comme `a3f2b7c`). C'est l'empreinte digitale de cette sauvegarde. Impossible d'avoir deux commits avec le meme hash. Ca garantit l'integrite de tout l'historique.
+
+<Analogy>
+Un commit, c'est comme une photo de famille. Tu rassembles les personnes que tu veux sur la photo (git add), tu prends la photo (git commit), et tu ecris la date et l'occasion au dos (le message de commit). Des annees plus tard, tu peux retrouver exactement qui etait la et a quoi ils ressemblaient.
+</Analogy>
+
+<KeyConcept term="Commit">
+Un snapshot complet de ton projet a un moment donne. Il contient les modifications, l'auteur, la date et un message descriptif. Chaque commit est identifie par un hash unique (SHA-1) et pointe vers le commit precedent, formant ainsi une chaine chronologique.
+</KeyConcept>
+
+<Example brand="GitHub">
+Sur GitHub, chaque commit est visible publiquement avec son message, son auteur et la liste exacte des lignes modifiees (le "diff"). Par exemple, le repo de React montre des milliers de commits depuis 2013, chacun documentant une etape de l'evolution du framework. Tu peux remonter dans le temps et voir le code de React tel qu'il etait il y a 10 ans.
+</Example>
+
+<Callout type="tip">
+Un bon message de commit explique le POURQUOI, pas le QUOI. "Fix bug" est inutile. "fix(auth): prevent duplicate session on page refresh" dit exactement ce qui a ete resolu et pourquoi.
+</Callout>
+
+</Layer>
+
+<Layer id="arbre-commits" order={3} title="Arbre de commits" subtitle="L'historique lineaire" icon="GitCommitHorizontal">
+
+## La chaine du temps
+
+Les commits ne sont pas independants : chaque commit pointe vers son parent (le commit precedent). Ca forme une chaine, un historique lineaire qui raconte l'histoire de ton projet du debut a aujourd'hui.
+
+Tu peux naviguer dans cet historique avec `git log`. Tu verras la liste de tous les commits, du plus recent au plus ancien, avec leurs messages, dates et auteurs. C'est le journal de bord de ton projet.
+
+La puissance de cet historique, c'est que tu peux revenir a n'importe quel point. Un bug introduit il y a 3 semaines ? Tu peux comparer le code d'aujourd'hui avec celui d'il y a 3 semaines pour trouver exactement quel commit a cause le probleme. C'est la commande `git bisect`, un vrai super-pouvoir de debugging.
+
+<Analogy>
+L'arbre de commits, c'est comme un journal intime avec des entrees datees. Tu ne peux pas modifier une entree passee sans que ca se voie. Chaque nouvelle entree fait reference a la precedente. Si tu arraches une page au milieu, toute la suite n'a plus de sens. C'est cette continuite qui rend l'historique fiable.
+</Analogy>
+
+<KeyConcept term="HEAD">
+Un pointeur qui indique ou tu te trouves dans l'historique. En general, HEAD pointe sur le dernier commit de ta branche actuelle. Quand tu fais `git checkout` vers un ancien commit, HEAD se deplace pour pointer dessus. C'est ta position dans la timeline.
+</KeyConcept>
+
+<Example brand="Linux">
+Le kernel Linux est le plus grand projet Git au monde (c'est normal, Git a ete cree par Linus Torvalds justement pour gerer le kernel). Son historique contient plus d'un million de commits depuis 2005. Grace a cet historique, n'importe quel developpeur peut comprendre pourquoi chaque ligne de code existe et qui l'a ecrite.
+</Example>
+
+</Layer>
+
+<Layer id="branches" order={4} title="Branches" subtitle="Les univers paralleles" icon="GitBranch">
+
+## Travailler sans casser ce qui marche
+
+Une branche, c'est une ligne de developpement independante. Quand tu crees une branche, tu crees une copie virtuelle de ton projet ou tu peux faire des modifications sans toucher a la version principale. C'est comme ouvrir un univers parallele.
+
+La branche principale s'appelle generalement `main` (ou `master`). C'est la version "officielle" de ton projet, celle qui est deployee en production. Quand tu veux ajouter une fonctionnalite ou corriger un bug, tu crees une branche dediee (`feature/user-auth`, `fix/login-crash`), tu travailles dessus, et tu la fusionnes dans `main` quand c'est pret.
+
+Les branches sont extremement legeres dans Git. Creer une branche ne copie pas les fichiers, ca cree juste un petit pointeur. Tu peux en creer des dizaines sans impact sur les performances.
+
+<Analogy>
+Les branches, c'est comme les brouillons dans un document Google. Tu peux creer un brouillon pour tester une idee sans modifier l'original. Si l'idee est bonne, tu l'integres dans le document final. Si c'est nul, tu supprimes le brouillon et personne n'a rien vu.
+</Analogy>
+
+<KeyConcept term="Branche">
+Une ligne de developpement isolee qui diverge de l'historique principal. Techniquement, c'est juste un pointeur vers un commit. Chaque nouveau commit sur une branche avance ce pointeur. Les branches permettent de travailler sur plusieurs fonctionnalites en parallele sans conflits.
+</KeyConcept>
+
+<Example brand="Netflix">
+Les equipes de Netflix utilisent des centaines de branches simultanement. Quand un developpeur travaille sur le nouvel algorithme de recommandation, il le fait sur sa branche sans risquer de casser le streaming pour 200 millions d'utilisateurs. La branche n'est fusionnee dans main qu'apres tests et validation.
+</Example>
+
+<Callout type="info">
+Convention de nommage des branches : `feature/nom-fonctionnalite`, `fix/nom-du-bug`, `chore/nom-tache`. Ca permet a toute l'equipe de comprendre immediatement le but de chaque branche.
+</Callout>
+
+</Layer>
+
+<Layer id="merge-rebase" order={5} title="Merge & Rebase" subtitle="Reunir les univers" icon="GitMerge">
+
+## Fusionner le travail
+
+A un moment, il faut reunir les univers paralleles. Le merge (fusion) prend les modifications d'une branche et les integre dans une autre. C'est le moment ou ta fonctionnalite developpee en isolation rejoint le projet principal.
+
+Dans le cas simple, Git fait un "fast-forward" : il avance juste le pointeur. Mais quand deux branches ont modifie les memes fichiers, Git peut creer un "merge commit" qui combine les deux. Et parfois, quand deux personnes ont modifie la meme ligne, Git ne peut pas decider seul : c'est le conflit. Tu dois le resoudre manuellement.
+
+Le rebase est une alternative au merge. Au lieu de creer un commit de fusion, il "rejoue" tes commits sur le bout de l'autre branche, comme si tu avais commence a travailler a partir de la derniere version. Ca donne un historique plus propre et lineaire, mais c'est plus risque.
+
+<Analogy>
+Le merge, c'est comme reunir deux equipes qui ont travaille sur des parties differentes d'un puzzle. En general, les pieces s'assemblent sans probleme. Mais si deux equipes ont travaille sur la meme zone du puzzle avec des pieces differentes, il faut decider quelle version garder. C'est le conflit.
+</Analogy>
+
+<KeyConcept term="Merge Conflict">
+Un conflit survient quand deux branches ont modifie la meme partie d'un fichier de maniere incompatible. Git marque les zones conflictuelles dans le fichier avec des marqueurs (`<<<<<<<`, `=======`, `>>>>>>>`), et c'est a toi de choisir quelle version garder ou comment combiner les deux.
+</KeyConcept>
+
+<Example brand="Spotify">
+Chez Spotify, des centaines de developpeurs mergent du code chaque jour. Ils utilisent un systeme de "trunk-based development" ou les branches sont tres courtes (quelques heures a quelques jours max) pour minimiser les conflits. Plus une branche vit longtemps, plus elle diverge de main, et plus le merge sera douloureux.
+</Example>
+
+<Callout type="warning">
+Regle d'or : ne jamais rebase une branche partagee avec d'autres developpeurs. Le rebase reecrit l'historique, ce qui cree un chaos total si quelqu'un d'autre a base son travail sur les anciens commits.
+</Callout>
+
+</Layer>
+
+<Layer id="remote-github" order={6} title="Remote (GitHub)" subtitle="La copie dans le cloud" icon="Cloud">
+
+## Ton code dans le cloud
+
+Un remote, c'est une copie de ton repo Git hebergee sur un serveur distant. GitHub est le remote le plus populaire, mais GitLab et Bitbucket existent aussi. Le remote sert de point central ou toute l'equipe synchronise son travail.
+
+Quand tu crees un repo sur GitHub, tu crees un remote. Ton repo local et le remote sont deux copies independantes qui se synchronisent quand tu le decides (push/pull). Si ton disque dur lache, ton code est en securite sur GitHub. Si GitHub tombe (rare), tu as toujours ta copie locale.
+
+GitHub ajoute des fonctionnalites par-dessus Git : les Pull Requests, les Issues, les Actions (CI/CD), les Pages, les Discussions. Git tout seul ne fait que versionner des fichiers. GitHub transforme ca en plateforme de collaboration.
+
+<Analogy>
+Le remote, c'est comme un Google Drive pour ton code. Tu travailles sur ton fichier en local, et quand tu es pret, tu le synchronises avec le cloud. Tes collegues font pareil. Le cloud sert de point de rendez-vous ou tout le monde se retrouve.
+</Analogy>
+
+<KeyConcept term="Remote (origin)">
+Un depot Git distant (generalement sur GitHub, GitLab ou Bitbucket) qui sert de reference partagee pour l'equipe. Par convention, le remote principal s'appelle "origin". C'est la ou tu push ton code et d'ou tu pull les modifications des autres.
+</KeyConcept>
+
+<Example brand="GitHub">
+GitHub heberge plus de 400 millions de repositories. Des projets open-source comme React, Next.js, n8n, ou Linux sont tous sur GitHub. Quand tu fais `npx create-next-app`, le code est telecharge depuis le repo GitHub de Next.js. GitHub est devenu le CV des developpeurs : tes contributions publiques montrent ce que tu sais faire.
+</Example>
+
+</Layer>
+
+<Layer id="push-pull" order={7} title="Push / Pull" subtitle="Synchroniser local et remote" icon="RefreshCw">
+
+## L'envoi et la reception
+
+Push et Pull sont les deux commandes qui synchronisent ton repo local avec le remote. `git push` envoie tes commits locaux vers GitHub. `git pull` recupere les commits des autres depuis GitHub vers ton repo local.
+
+Le workflow classique : tu fais tes modifications en local, tu commit, puis tu push. Si un collegue a push entre-temps, Git te demandera de pull d'abord pour integrer ses modifications avant de pouvoir push les tiennes. Ca evite d'ecraser le travail des autres.
+
+`git fetch` est le cousin prudent de `git pull`. Il telecharge les nouveautes du remote sans les appliquer a tes fichiers. Tu peux voir ce qui a change avant de decider de l'integrer. `git pull` fait en fait un `git fetch` + `git merge` en une seule commande.
+
+<Analogy>
+Push et Pull, c'est comme la boite aux lettres. Push, c'est poster une lettre (envoyer ton travail). Pull, c'est relever le courrier (recuperer le travail des autres). Si quelqu'un a mis un colis trop gros dans la boite (un conflit), tu dois le traiter avant de pouvoir poster ta lettre.
+</Analogy>
+
+<KeyConcept term="Push / Pull">
+Les deux operations de synchronisation entre ton repo local et le remote. Push envoie tes commits vers le serveur distant. Pull recupere les commits du serveur et les fusionne dans ta branche locale. Ces operations ne sont jamais automatiques, c'est toujours toi qui decides quand synchroniser.
+</KeyConcept>
+
+<Example brand="Claude Code">
+Quand tu utilises Claude Code et qu'il modifie des fichiers, les changements sont locaux. Rien n'est envoye sur GitHub tant que TU ne fais pas un `git push`. C'est un filet de securite : tu peux revoir les modifications de Claude, les tester, et seulement ensuite les push. Si ca ne te plait pas, un `git checkout .` et tout revient a l'etat precedent.
+</Example>
+
+<Callout type="tip">
+Prends l'habitude de faire `git pull` chaque matin avant de commencer a coder. Ca t'evite de travailler sur une version obsolete et de decouvrir des conflits enormes en fin de journee.
+</Callout>
+
+</Layer>
+
+<Layer id="collaboration" order={8} title="Collaboration" subtitle="PRs, reviews, issues" icon="Users">
+
+## Travailler en equipe
+
+La collaboration, c'est la raison d'etre de Git. Les Pull Requests (PRs) sont le coeur du workflow collaboratif. Quand ta branche est prete, tu ouvres une PR sur GitHub pour demander a ton equipe de relire ton code avant de le fusionner dans main.
+
+Les code reviews dans les PRs permettent de commenter ligne par ligne, suggerer des modifications, et approuver ou demander des changements. C'est un filet de securite collectif : quatre yeux voient mieux que deux. Les bugs sont attrapes avant d'arriver en production.
+
+Les Issues servent a tracker les bugs, les fonctionnalites a developper, et les taches. Tu peux lier une PR a une Issue pour montrer que tel commit resout tel probleme. GitHub Actions peut automatiser les tests, le linting et le deploiement a chaque push. C'est le CI/CD (Continuous Integration / Continuous Deployment).
+
+<Analogy>
+La collaboration Git, c'est comme le processus editorial d'un journal. Le journaliste ecrit son article (branche), le soumet au redacteur en chef (Pull Request), qui le relit et demande des corrections (code review). L'article n'est publie (merge dans main) que quand le redacteur approuve. Ca evite les fautes et les informations incorrectes.
+</Analogy>
+
+<KeyConcept term="Pull Request (PR)">
+Une demande de fusion d'une branche vers une autre, generalement vers main. C'est l'espace de discussion ou l'equipe revoit le code, commente les changements, execute les tests automatiques, et approuve (ou refuse) la fusion. C'est le pilier du developpement collaboratif moderne.
+</KeyConcept>
+
+<Example brand="Vercel">
+Le repo open-source de Next.js sur GitHub recoit des centaines de Pull Requests par mois, aussi bien de l'equipe Vercel que de contributeurs externes. Chaque PR declenche des tests automatiques (GitHub Actions), passe par une code review de l'equipe core, et n'est mergee que quand tout est vert. C'est comme ca qu'un framework utilise par des millions de devs reste stable.
+</Example>
+
+</Layer>
+
+</LayerStack>

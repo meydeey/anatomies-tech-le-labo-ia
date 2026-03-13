@@ -1,0 +1,205 @@
+<LayerStack>
+
+<Layer id="client-navigateur" order={1} title="Client (navigateur)" subtitle="L'utilisateur qui clique" icon="Monitor">
+
+## Tout commence par un clic
+
+Chaque fois que tu tapes une URL dans la barre d'adresse ou que tu cliques sur un lien, ton navigateur (Chrome, Firefox, Safari) devient un **client**. Il envoie une demande vers un serveur quelque part dans le monde. C'est le point de depart de toute requete HTTP.
+
+Le navigateur n'est pas le seul client possible. Quand tu configures un noeud HTTP Request dans n8n, c'est n8n qui devient le client. Quand ton code JavaScript fait un `fetch()`, c'est ton application qui joue ce role. Le principe reste identique : quelqu'un envoie une demande, quelqu'un d'autre repond.
+
+<Analogy>
+Le client, c'est comme toi au comptoir d'un restaurant. Tu passes ta commande (la requete) au serveur (le... serveur). Tu ne vas pas en cuisine toi-meme, tu delegues. Le navigateur fait exactement pareil : il formule ta demande et l'envoie au bon endroit.
+</Analogy>
+
+<KeyConcept term="Client HTTP">
+Un client HTTP est tout logiciel capable d'envoyer une requete HTTP et de recevoir une reponse. Ton navigateur, Postman, curl, un noeud n8n, une fonction `fetch()` en JavaScript : ce sont tous des clients HTTP. Ils formulent une demande selon le protocole HTTP et attendent une reponse.
+</KeyConcept>
+
+<Example brand="Google">
+Quand tu tapes "google.com" dans Chrome, ton navigateur devient un client HTTP. Il envoie une requete GET vers les serveurs de Google. Chaque recherche que tu fais ensuite genere une nouvelle requete. Google recoit environ 8,5 milliards de requetes par jour, toutes envoyees par des clients comme ton navigateur.
+</Example>
+
+</Layer>
+
+<Layer id="resolution-dns" order={2} title="Resolution DNS" subtitle="Trouver l'adresse IP du serveur" icon="Search">
+
+## Traduire un nom en adresse
+
+Avant d'envoyer quoi que ce soit, ton navigateur a un probleme : il connait le nom du site (par exemple `netflix.com`) mais pas son adresse numerique (l'IP). C'est comme connaitre le nom d'un restaurant mais pas son adresse postale. Impossible de s'y rendre sans ca.
+
+Le navigateur interroge donc le systeme DNS (Domain Name System) pour transformer `netflix.com` en quelque chose comme `54.237.226.164`. Cette etape est invisible pour toi, mais elle se produit a chaque premiere visite d'un site. Le resultat est mis en cache pour accelerer les visites suivantes.
+
+Si le DNS ne repond pas ou pointe vers la mauvaise IP, tu obtiens une erreur "site introuvable". C'est pour ca que quand tu changes l'hebergement d'un site, il faut attendre la propagation DNS : les anciens caches pointent encore vers l'ancienne adresse.
+
+<Analogy>
+Le DNS, c'est le repertoire telephonique d'Internet. Tu cherches "Netflix" dans le repertoire, et il te donne le numero (l'adresse IP) pour les joindre. Sans ce repertoire, il faudrait memoriser des numeros a 12 chiffres pour chaque site. Personne ne ferait ca.
+</Analogy>
+
+<KeyConcept term="Resolution DNS">
+La resolution DNS est le processus qui convertit un nom de domaine lisible par un humain (comme `spotify.com`) en une adresse IP lisible par une machine (comme `35.186.224.25`). Ce processus implique plusieurs serveurs DNS hierarchiques et prend generalement entre 10 et 100 millisecondes.
+</KeyConcept>
+
+<Example brand="Spotify">
+Quand tu ouvres l'app Spotify, elle doit contacter les serveurs de Spotify. L'app demande au DNS : "C'est quoi l'IP de api.spotify.com ?" Le DNS repond avec une adresse IP, et seulement apres ca, Spotify peut envoyer ses requetes pour charger tes playlists. Si Spotify utilise un CDN comme Cloudflare, le DNS peut meme te diriger vers le serveur le plus proche de toi geographiquement.
+</Example>
+
+</Layer>
+
+<Layer id="connexion-tcp" order={3} title="Connexion TCP" subtitle="Etablir le canal de communication" icon="Cable">
+
+## Ouvrir le canal
+
+Maintenant que le navigateur connait l'adresse IP, il doit etablir une connexion fiable avec le serveur. C'est le role du protocole TCP (Transmission Control Protocol). TCP garantit que les donnees arrivent completes, dans le bon ordre, sans erreur.
+
+L'etablissement de la connexion TCP se fait en 3 etapes, appelees le **three-way handshake** : ton navigateur dit "SYN" (je veux communiquer), le serveur repond "SYN-ACK" (ok, je suis pret), et ton navigateur confirme "ACK" (c'est parti). Ce n'est qu'apres ces 3 echanges que les vraies donnees peuvent circuler.
+
+Ce mecanisme existe pour une bonne raison : sans lui, les paquets de donnees pourraient se perdre en route sans que personne ne s'en rende compte. TCP s'assure que chaque morceau de donnee est bien recu, et redemande les morceaux perdus.
+
+<Analogy>
+TCP, c'est comme un appel telephonique. Avant de parler, il y a une phase de connexion : ca sonne (SYN), l'autre personne decroche et dit "allo" (SYN-ACK), tu reponds "oui, c'est moi" (ACK). Seulement apres, la conversation commence. Si la ligne coupe, tu le sais et tu rappelles.
+</Analogy>
+
+<KeyConcept term="TCP (Transmission Control Protocol)">
+TCP est le protocole de transport qui garantit une communication fiable entre deux machines. Il decoupe les donnees en paquets, les numerote, verifie leur reception, et redemande ceux qui se perdent en route. C'est la fondation sur laquelle HTTP fonctionne.
+</KeyConcept>
+
+<Example brand="Amazon">
+Quand tu ajoutes un article a ton panier sur Amazon, la connexion TCP garantit que ta requete arrive integralement au serveur. Imagine si un bout de la requete se perdait : le serveur pourrait ajouter le mauvais article, ou rien du tout. TCP empeche ce genre de catastrophe en verifiant chaque paquet.
+</Example>
+
+</Layer>
+
+<Layer id="handshake-tls" order={4} title="Handshake TLS" subtitle="Securiser le canal (HTTPS)" icon="Lock">
+
+## Le cadenas se met en place
+
+Si l'URL commence par `https://` (et c'est le cas de quasiment tous les sites aujourd'hui), une etape supplementaire s'ajoute apres TCP : le handshake TLS. C'est la negociation qui met en place le chiffrement entre ton navigateur et le serveur.
+
+Pendant ce handshake, le serveur presente son **certificat SSL/TLS** — une sorte de carte d'identite numerique. Ton navigateur verifie que ce certificat est valide et n'a pas ete falsifie. Ensuite, les deux parties se mettent d'accord sur une cle de chiffrement commune. A partir de la, toutes les donnees echangees sont chiffrees : meme si quelqu'un intercepte les paquets, il ne pourra pas les lire.
+
+Sans TLS, tes mots de passe, numeros de carte bancaire et donnees personnelles circuleraient en clair sur le reseau. N'importe qui sur le meme Wi-Fi pourrait les lire.
+
+<Analogy>
+Le handshake TLS, c'est comme echanger une valise diplomatique. D'abord, tu verifies l'identite de ton interlocuteur (le certificat). Ensuite, vous vous mettez d'accord sur un code secret que vous seuls connaissez. A partir de la, tous vos messages sont codes. Meme si quelqu'un vole la valise en route, il ne pourra pas lire le contenu.
+</Analogy>
+
+<KeyConcept term="TLS (Transport Layer Security)">
+TLS est le protocole de securite qui chiffre les communications entre un client et un serveur. C'est le "S" de HTTPS. Il assure trois choses : la confidentialite (personne ne peut lire les donnees), l'integrite (personne ne peut les modifier en route) et l'authentification (tu parles bien au bon serveur).
+</KeyConcept>
+
+<Example brand="Netflix">
+Quand tu te connectes a Netflix et que tu entres tes identifiants, le handshake TLS s'est deja produit. Ton mot de passe voyage chiffre entre ton navigateur et les serveurs Netflix. Meme ton fournisseur d'acces Internet ne peut pas voir ton mot de passe — il voit juste que tu communiques avec Netflix, mais pas le contenu des echanges.
+</Example>
+
+<Callout type="warning">
+Si ton navigateur affiche un avertissement "connexion non securisee", ca signifie que le handshake TLS a echoue ou que le certificat du site est invalide. Ne saisis jamais de mot de passe sur un tel site.
+</Callout>
+
+</Layer>
+
+<Layer id="requete-http" order={5} title="Requete HTTP" subtitle="Methode + URL + headers + body" icon="Send">
+
+## La demande est formulee
+
+Le canal est ouvert et securise. Ton navigateur peut enfin envoyer la requete HTTP proprement dite. Une requete HTTP se compose de plusieurs parties : la **methode** (ce que tu veux faire), l'**URL** (ou tu veux le faire), les **headers** (des infos contextuelles) et parfois un **body** (des donnees a envoyer).
+
+Les methodes les plus courantes sont `GET` (je veux lire quelque chose), `POST` (je veux envoyer/creer quelque chose), `PUT` (je veux modifier quelque chose) et `DELETE` (je veux supprimer quelque chose). Quand tu charges une page web, c'est un GET. Quand tu soumets un formulaire, c'est generalement un POST.
+
+Les headers transportent des metadonnees : quel navigateur tu utilises, quelle langue tu preferes, tes cookies de session, le format de donnees que tu acceptes. C'est comme l'enveloppe d'une lettre — le contenu est dans le body, mais l'enveloppe donne des infos essentielles au facteur.
+
+<Analogy>
+La requete HTTP, c'est un bon de commande structure. La methode, c'est le type de demande (commande, retour, modification). L'URL, c'est le rayon du magasin. Les headers, ce sont les informations du client (numero de fidelite, adresse de livraison). Le body, c'est le detail de la commande elle-meme.
+</Analogy>
+
+<KeyConcept term="Methode HTTP">
+Les methodes HTTP (aussi appelees "verbes") definissent l'action souhaitee. GET = lire, POST = creer, PUT = remplacer, PATCH = modifier partiellement, DELETE = supprimer. Cette convention s'appelle REST et c'est le standard qu'utilisent quasiment toutes les APIs modernes.
+</KeyConcept>
+
+<Example brand="Uber">
+Quand tu commandes un Uber, l'app envoie un POST a l'API d'Uber avec dans le body : ton point de depart, ta destination, le type de vehicule. Les headers contiennent ton token d'authentification (pour prouver que c'est bien toi). L'URL est quelque chose comme `api.uber.com/v1/requests`. Tout ca forme une requete HTTP complete.
+</Example>
+
+</Layer>
+
+<Layer id="traitement-serveur" order={6} title="Traitement serveur" subtitle="Le serveur lit et traite la demande" icon="Cog">
+
+## La cuisine travaille
+
+La requete arrive sur le serveur. Maintenant, c'est a lui de jouer. Le serveur web (Nginx, Apache, ou un framework comme Next.js, FastAPI, Express) recoit la requete, la parse, et la route vers le bon morceau de code.
+
+Le traitement peut etre simple (servir un fichier HTML statique) ou complexe (interroger une base de donnees, appeler d'autres APIs, executer de la logique metier, generer du contenu dynamique). C'est ici que vit toute l'intelligence de l'application.
+
+Si le serveur a besoin de donnees, il interroge une base de donnees (PostgreSQL, MongoDB). S'il doit verifier ton identite, il decode ton token JWT. S'il doit appeler un service tiers (Stripe pour un paiement, OpenAI pour de l'IA), il envoie lui-meme des requetes HTTP a ces services. Un serveur peut etre client d'un autre serveur.
+
+<Analogy>
+C'est la cuisine du restaurant. Le serveur de salle a transmis ta commande au chef. Le chef consulte sa reserve d'ingredients (la base de donnees), suit la recette (la logique metier), prepare le plat (genere la reponse) et le renvoie en salle. Parfois il doit commander un ingredient a un fournisseur externe (appel API tiers).
+</Analogy>
+
+<KeyConcept term="Traitement serveur (Server-side processing)">
+Le traitement serveur englobe toutes les operations executees cote serveur pour repondre a une requete : routage, validation des donnees, authentification, requetes a la base de donnees, logique metier, et generation de la reponse. C'est le coeur invisible de toute application web.
+</KeyConcept>
+
+<Example brand="Airbnb">
+Quand tu cherches un logement sur Airbnb, le serveur recoit ta requete avec tes criteres (dates, ville, budget). Il interroge sa base de donnees pour trouver les logements disponibles, filtre selon tes criteres, calcule les prix avec les frais de service, verifie la disponibilite en temps reel, trie par pertinence, et assemble le tout en une reponse JSON. Tout ca en quelques centaines de millisecondes.
+</Example>
+
+</Layer>
+
+<Layer id="reponse-http" order={7} title="Reponse HTTP" subtitle="Status code + headers + body" icon="FileDown">
+
+## La reponse revient
+
+Le serveur a fini son travail et renvoie une reponse HTTP. Cette reponse a la meme structure qu'une requete : un **status code**, des **headers** et un **body**.
+
+Le status code est un nombre a 3 chiffres qui resume le resultat. Les plus courants : `200 OK` (tout s'est bien passe), `301 Redirect` (la page a demenage), `404 Not Found` (cette page n'existe pas), `500 Internal Server Error` (le serveur a plante). Tu as surement deja vu une page 404 — maintenant tu sais d'ou vient ce numero.
+
+Les headers de reponse contiennent des metadonnees : le type de contenu (`Content-Type: application/json`), la taille, les instructions de cache, les cookies a stocker. Le body contient le contenu reel : du HTML pour une page web, du JSON pour une API, une image, un fichier PDF...
+
+<Analogy>
+La reponse HTTP, c'est le plat qui arrive a ta table. Le status code, c'est le serveur qui te dit "voici votre commande" (200), "on n'a plus ca en stock" (404), ou "il y a eu un probleme en cuisine" (500). Les headers, c'est "attention, c'est chaud" ou "a consommer avant telle date". Et le body, c'est le plat lui-meme.
+</Analogy>
+
+<KeyConcept term="Status Code HTTP">
+Les codes de statut HTTP sont regroupes par centaine. 1xx = information, 2xx = succes, 3xx = redirection, 4xx = erreur cote client (tu as fait une mauvaise demande), 5xx = erreur cote serveur (le serveur a plante). Les connaitre t'aide a debugger rapidement quand quelque chose ne marche pas dans tes workflows n8n ou tes appels API.
+</KeyConcept>
+
+<Example brand="X (Twitter)">
+Quand tu publies un tweet, l'API de X renvoie un `201 Created` avec dans le body le JSON du tweet cree (son ID, le texte, la date). Si tu essaies de publier un tweet identique, tu recois un `403 Forbidden`. Si les serveurs de X sont surcharges, tu recois un `429 Too Many Requests` avec un header `Retry-After` qui te dit combien de secondes attendre.
+</Example>
+
+<Callout type="tip">
+Dans n8n, quand un noeud HTTP Request echoue, regarde le status code en premier. Un 401 = probleme d'authentification (verifie ta cle API). Un 429 = tu envoies trop de requetes (ajoute un delai). Un 500 = le probleme est chez eux, pas chez toi.
+</Callout>
+
+</Layer>
+
+<Layer id="rendu-navigateur" order={8} title="Rendu navigateur" subtitle="Afficher le resultat a l'ecran" icon="Eye">
+
+## L'ecran s'allume
+
+La reponse est arrivee dans le navigateur. Si c'est du HTML, le navigateur le parse et construit le DOM (Document Object Model) — une representation en arbre de la page. Ensuite, il charge le CSS pour savoir a quoi ca doit ressembler, puis execute le JavaScript pour ajouter l'interactivite.
+
+Ce processus est en fait une cascade de nouvelles requetes HTTP. Le HTML reference des fichiers CSS, des images, des scripts JS, des polices de caracteres — chacun declenche une nouvelle requete. Une page web moderne peut generer entre 20 et 200 requetes supplementaires juste pour s'afficher completement.
+
+Le navigateur optimise tout ca en parallele : il precharge certaines ressources, met en cache ce qu'il a deja telecharge, et affiche progressivement la page pour que tu n'aies pas a attendre que tout soit charge. C'est pour ca que parfois tu vois le texte apparaitre avant les images.
+
+<Analogy>
+Le rendu, c'est comme monter un meuble IKEA. Le HTML, c'est la liste des pieces. Le CSS, c'est le mode d'emploi qui dit ou placer chaque piece et de quelle couleur elle est. Le JavaScript, c'est le mecanisme qui fait que les tiroirs s'ouvrent et se ferment. Et comme chez IKEA, parfois il manque une piece (une image qui ne charge pas) mais le meuble tient quand meme.
+</Analogy>
+
+<KeyConcept term="Rendu navigateur (Browser Rendering)">
+Le rendu est le processus par lequel le navigateur transforme du code (HTML, CSS, JS) en pixels a l'ecran. Il suit un pipeline precis : parsing HTML, construction du DOM, application du CSS (CSSOM), layout (calcul des positions), painting (dessiner les pixels), et compositing (assembler les couches). Ce processus se repete a chaque mise a jour de la page.
+</KeyConcept>
+
+<Example brand="Google">
+Quand tu fais une recherche Google, la page de resultats semble apparaitre instantanement. En realite, ton navigateur recoit du HTML, charge le CSS critique inline (directement dans le HTML pour gagner du temps), affiche les resultats texte immediatement, puis charge les scripts JS, les suggestions, les images miniatures et les widgets en arriere-plan. Google optimise chaque milliseconde de ce rendu — leur objectif est un affichage complet en moins d'une seconde.
+</Example>
+
+<Callout type="info">
+Tout ce voyage — du clic a l'affichage — prend generalement entre 100ms et 3 secondes. C'est la que des outils comme Vercel ou Cloudflare sont utiles : ils rapprochent le serveur de l'utilisateur pour reduire ce temps.
+</Callout>
+
+</Layer>
+
+</LayerStack>
